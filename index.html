@@ -1,197 +1,267 @@
-
 <!DOCTYPE html>
-<html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alex.</title>
-
+  <title>Anagrafica 1.0</title>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg: #fff;
-      --fg: #000;
-      --line: #e5e5e5;
-    }
-
-    body.dark {
-      --bg: #000;
-      --fg: #fff;
-      --line: #292929;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: Arial, Helvetica, sans-serif;
+      background-color: #0d0d0d;
+      color: #e6e6e6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       min-height: 100vh;
-      transition: background .3s, color .3s;
+      padding: 2rem 1rem;
     }
 
-    .page {
-      min-height: 100vh;
-      min-height: 100dvh;
-      max-width: 1600px;
-      margin: auto;
-      padding: 32px 6%;
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    p.subtitle {
+      color: #888888;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
       display: flex;
       flex-direction: column;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .input-group label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aaaaaa;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
     }
 
-    .logo {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -1px;
+    input {
+      background: #1e1e1e;
+      border: 1px solid #333333;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input::placeholder {
+      color: #555555;
+    }
+
+    input:focus {
+      border-color: #ffffff;
+      background: #252525;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
     }
 
     button {
-      color: var(--fg);
-      background: none;
-      border: 1px solid var(--line);
-      padding: 10px 15px;
-      font-size: 12px;
+      width: 100%;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 8px;
+      padding: 0.9rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: .2s;
+      transition: all 0.2s ease;
+      margin-bottom: 2.5rem;
     }
 
     button:hover {
-      background: var(--fg);
-      color: var(--bg);
+      background: #cccccc;
+      transform: translateY(-1px);
     }
 
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 100px 0;
+    button:active {
+      transform: translateY(0);
     }
 
-    .eyebrow {
-      font-size: 11px;
-      letter-spacing: 3px;
+    .table-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: #1a1a1a;
+      color: #888888;
+      font-size: 0.8rem;
       text-transform: uppercase;
-      margin-bottom: 28px;
-    }
-
-    h1 {
-      font-size: clamp(68px, 13.5vw, 190px);
-      font-weight: 800;
-      letter-spacing: -0.095em;
-      line-height: .82;
-    }
-
-    h1 span {
-      display: block;
-      margin-top: 15px;
-    }
-
-    .bottom {
-      margin-top: 48px;
-      width: 100%;
-      max-width: 430px;
-    }
-
-    .line {
-      height: 1px;
-      width: 100%;
-      background: var(--line);
-      margin-bottom: 20px;
-    }
-
-    .description {
-      font-size: 13px;
-      line-height: 1.8;
-      max-width: 290px;
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--line);
-      padding-top: 18px;
-      font-size: 10px;
       letter-spacing: 1px;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid #2a2a2a;
     }
 
-    @media (max-width: 600px) {
-      .page {
-        padding: 24px 7%;
-      }
-
-      h1 {
-        font-size: clamp(64px, 15vw, 100px);
-      }
-
-      main {
-        padding: 70px 0;
-      }
-
-      .bottom {
-        margin-top: 35px;
-      }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #222222;
+      font-size: 0.95rem;
+      color: #dddddd;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        transition: none !important;
-      }
+    tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: #1c1c1c;
+    }
+
+    tbody:empty::after {
+      content: "Nessun dato inserito nella tabella";
+      display: block;
+      padding: 1.5rem;
+      color: #444444;
+      font-style: italic;
+      text-align: center;
     }
   </style>
 </head>
-
 <body>
-  <div class="page">
-    <header>
-      <div class="logo">A.</div>
-      <button id="theme">DARK MODE</button>
-    </header>
 
-    <main>
-      <p class="eyebrow">PERSONAL PAGE — 2026</p>
+  <div class="container">
+    <h2>Anagrafica 1.0</h2>
 
-      <h1>
-        Ciao,
-        <span>sono Alex.</span>
-      </h1>
-
-      <div class="bottom">
-        <div class="line"></div>
-        <p class="description">
-          Uno spazio personale.<br>
-          Nient'altro.
-        </p>
+    <div class="form-grid">
+      <div class="input-group">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" placeholder="Alexandru">
       </div>
-    </main>
+      <div class="input-group">
+        <label for="cognome">Cognome</label>
+        <input type="text" id="cognome" placeholder="Mihalache">
+      </div>
+      <div class="input-group">
+        <label for="indirizzo">Indirizzo</label>
+        <input type="text" id="indirizzo" placeholder="Via Massacciuccioli 69">
+      </div>
+      <div class="input-group">
+        <label for="citta">Città</label>
+        <input type="text" id="citta" placeholder="Roma">
+      </div>
+      <div class="input-group">
+        <label for="eta">Età</label>
+        <input type="number" id="eta" placeholder="18">
+      </div>
+    </div>
 
-    <footer>
-      <span>ALEX.</span>
-      <span>LESS, BUT BETTER.</span>
-    </footer>
+    <button onclick="aggiungiRiga()">Aggiungi alla Tabella</button>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Indirizzo</th>
+            <th>Città</th>
+            <th>Età</th>
+          </tr>
+        </thead>
+        <tbody id="corpoTabella">
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    const btn = document.getElementById("theme");
+    function aggiungiRiga() {
+      let nome = document.getElementById('nome').value;
+      let cognome = document.getElementById('cognome').value;
+      let indirizzo = document.getElementById('indirizzo').value;
+      let citta = document.getElementById('citta').value;
+      let eta = document.getElementById('eta').value;
 
-    btn.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
+      if (!nome && !cognome && !indirizzo && !citta && !eta) {
+        return;
+      }
 
-      btn.textContent = document.body.classList.contains("dark")
-        ? "LIGHT MODE"
-        : "DARK MODE";
-    });
+      let td1 = document.createElement('td');
+      td1.textContent = nome;
+
+      let td2 = document.createElement('td');
+      td2.textContent = cognome;
+
+      let td3 = document.createElement('td');
+      td3.textContent = indirizzo;
+
+      let td4 = document.createElement('td');
+      td4.textContent = citta;
+
+      let td5 = document.createElement('td');
+      td5.textContent = eta;
+
+      let tr = document.createElement('tr');
+      tr.appendChild(td1);
+      tr.appendChild(td2);
+      tr.appendChild(td3);
+      tr.appendChild(td4);
+      tr.appendChild(td5);
+
+      document.getElementById('corpoTabella').appendChild(tr);
+
+      document.getElementById('nome').value = '';
+      document.getElementById('cognome').value = '';
+      document.getElementById('indirizzo').value = '';
+      document.getElementById('citta').value = '';
+      document.getElementById('eta').value = '';
+    }
   </script>
+
 </body>
 </html>
