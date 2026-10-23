@@ -301,6 +301,7 @@
       transition: all 0.35s ease;
       position: relative;
       overflow: hidden;
+      cursor: pointer; /* Indica che la card è cliccabile */
     }
 
     .project-card::before {
@@ -635,10 +636,12 @@
   <div class="modal-overlay" id="workModal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">Aggiungi Nuovo Lavoro</h3>
+        <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
         <button class="btn-close" id="closeModalBtn">&times;</button>
       </div>
       <form id="addWorkForm">
+        <input type="hidden" id="editProjectId">
+        
         <div class="form-group">
           <label class="form-label" for="workTitle">Titolo del Progetto *</label>
           <input type="text" id="workTitle" class="form-input" placeholder="Es. E-commerce di Lusso" required>
@@ -665,7 +668,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn-secondary" id="cancelBtn">Annulla</button>
-          <button type="submit" class="btn-primary">Salva Lavoro</button>
+          <button type="submit" class="btn-primary" id="saveBtnText">Salva Lavoro</button>
         </div>
       </form>
     </div>
@@ -678,33 +681,8 @@
 
   <!-- Script JS Interattivo -->
   <script>
-    // Dati Predefiniti Iniziali (se LocalStorage è vuoto)
-    const defaultProjects = [
-      {
-        id: '1',
-        title: 'Design Minimalista Scuro',
-        category: 'Completi',
-        url: 'https://github.com',
-        description: 'Interfaccia utente moderna realizzata per un brand d’alta moda con animazioni fluide e contrasti eleganti in rosso rubino.'
-      },
-      {
-        id: '2',
-        title: 'Piattaforma Web App',
-        category: 'Incompleti',
-        url: 'https://google.com',
-        description: 'Applicazione web in fase di sviluppo focalizzata sulla reattività e sulla gestione ottimizzata dei dati locali.'
-      },
-      {
-        id: '3',
-        title: 'Identità Visiva Red Luxury',
-        category: 'Default',
-        url: 'https://behance.net',
-        description: 'Studio di base del brand, palette colori, tipografia custom e linee guida per prodotti digitali esclusivi.'
-      }
-    ];
-
-    // Stato dell'applicazione
-    let projects = JSON.parse(localStorage.getItem('alex_projects_v2')) || defaultProjects;
+    // Stato dell'applicazione (inizialmente vuoto senza lavori predefiniti)
+    let projects = JSON.parse(localStorage.getItem('alex_projects_v3')) || [];
     let activeFilter = 'all';
     let searchQuery = '';
 
@@ -717,10 +695,13 @@
     const cancelBtn = document.getElementById('cancelBtn');
     const workModal = document.getElementById('workModal');
     const addWorkForm = document.getElementById('addWorkForm');
+    const modalTitleText = document.getElementById('modalTitleText');
+    const saveBtnText = document.getElementById('saveBtnText');
+    const editProjectId = document.getElementById('editProjectId');
 
     // Salva nel LocalStorage
     function saveProjects() {
-      localStorage.setItem('alex_projects', JSON.stringify(projects));
+      localStorage.setItem('alex_projects_v3', JSON.stringify(projects));
     }
 
     // Renderizza i Lavori
@@ -731,8 +712,8 @@
       const filtered = projects.filter(project => {
         const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
         const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              project.category.toLowerCase().includes(searchQuery.toLowerCase());
+                            project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            project.category.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
       });
 
@@ -741,7 +722,7 @@
           <div class="empty-state">
             <i class="fa-solid fa-folder-open"></i>
             <h3>Nessun lavoro trovato</h3>
-            <p>Riprova con un'altra ricerca o aggiungi un nuovo lavoro dal pulsante in alto.</p>
+            <p>Aggiungi un nuovo lavoro cliccando sul pulsante in alto.</p>
           </div>
         `;
         return;
@@ -750,11 +731,18 @@
       filtered.forEach(project => {
         const card = document.createElement('div');
         card.className = 'project-card';
+        // Cliccando sulla card (esclusi i bottoni interni) si apre la modifica del tag/lavoro
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('button') && !e.target.closest('a')) {
+            openEditModal(project.id);
+          }
+        });
+
         card.innerHTML = `
           <div>
             <div class="card-top">
               <span class="category-badge">${escapeHtml(project.category)}</span>
-              <button class="btn-delete" title="Elimina Lavoro" onclick="deleteProject('${project.id}')">
+              <button class="btn-delete" title="Elimina Lavoro" onclick="deleteProject('${project.id}', event)">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -771,10 +759,11 @@
       });
     }
 
-    // Aggiungi Nuovo Progetto
-    function handleAddProject(e) {
+    // Gestisci Aggiunta o Modifica Progetto
+    function handleFormSubmit(e) {
       e.preventDefault();
       
+      const id = editProjectId.value;
       const title = document.getElementById('workTitle').value.trim();
       const category = document.getElementById('workCategory').value;
       const url = document.getElementById('workUrl').value.trim();
@@ -782,25 +771,59 @@
 
       if (!title || !category || !url || !description) return;
 
-      const newProject = {
-        id: Date.now().toString(),
-        title,
-        category,
-        url,
-        description
-      };
+      if (id) {
+        // Modifica esistente
+        projects = projects.map(p => {
+          if (p.id === id) {
+            return { ...p, title, category, url, description };
+          }
+          return p;
+        });
+      } else {
+        // Nuovo progetto
+        const newProject = {
+          id: Date.now().toString(),
+          title,
+          category,
+          url,
+          description
+        };
+        projects.unshift(newProject);
+      }
 
-      projects.unshift(newProject);
       saveProjects();
       renderProjects();
+      closeModal();
+    }
 
-      // Reset form e chiusura
+    // Apri Modale per Creazione
+    function openCreateModal() {
       addWorkForm.reset();
-      toggleModal(false);
+      editProjectId.value = '';
+      modalTitleText.textContent = 'Aggiungi Nuovo Lavoro';
+      saveBtnText.textContent = 'Salva Lavoro';
+      toggleModal(true);
+    }
+
+    // Apri Modale per Modifica
+    function openEditModal(id) {
+      const project = projects.find(p => p.id === id);
+      if (!project) return;
+
+      editProjectId.value = project.id;
+      document.getElementById('workTitle').value = project.title;
+      document.getElementById('workCategory').value = project.category;
+      document.getElementById('workUrl').value = project.url;
+      document.getElementById('workDesc').value = project.description;
+
+      modalTitleText.textContent = 'Modifica Lavoro / Tag';
+      saveBtnText.textContent = 'Aggiorna Lavoro';
+      toggleModal(true);
     }
 
     // Elimina Progetto
-    window.deleteProject = function(id) {
+    window.deleteProject = function(id, event) {
+      event.stopPropagation();
       if (confirm('Sei sicuro di voler eliminare questo lavoro?')) {
         projects = projects.filter(p => p.id !== id);
         saveProjects();
@@ -815,6 +838,12 @@
       } else {
         workModal.classList.remove('active');
       }
+    }
+
+    function closeModal() {
+      toggleModal(false);
+      addWorkForm.reset();
+      editProjectId.value = '';
     }
 
     // Utility di sicurezza sanitizzazione HTML
@@ -845,16 +874,16 @@
       }
     });
 
-    openModalBtn.addEventListener('click', () => toggleModal(true));
-    closeModalBtn.addEventListener('click', () => toggleModal(false));
-    cancelBtn.addEventListener('click', () => toggleModal(false));
+    openModalBtn.addEventListener('click', openCreateModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
     
     // Chiudi modale se si clicca fuori dalla scheda
     workModal.addEventListener('click', (e) => {
-      if (e.target === workModal) toggleModal(false);
+      if (e.target === workModal) closeModal();
     });
 
-    addWorkForm.addEventListener('submit', handleAddProject);
+    addWorkForm.addEventListener('submit', handleFormSubmit);
 
     // Inizializzazione al caricamento
     renderProjects();
