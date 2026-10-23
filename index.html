@@ -4,331 +4,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f5f5fa">
   <title>Ciao, sono Alex</title>
 
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #f5f5fa;
-      --surface: rgba(255, 255, 255, 0.72);
-      --text: #171725;
-      --muted: #77778c;
-      --accent: #7762f6;
-      --border: rgba(120, 110, 160, 0.16);
-      --shadow: 0 24px 80px rgba(45, 35, 90, 0.10);
-    }
-
-    body.dark {
-      color-scheme: dark;
-      --bg: #101018;
-      --surface: rgba(29, 29, 43, 0.78);
-      --text: #f4f2ff;
-      --muted: #a09db7;
-      --accent: #a394ff;
-      --border: rgba(190, 180, 255, 0.13);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
-    }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --secondary: #666666;
+      --border: #e5e5e5;
+      --button-bg: #111111;
+      --button-text: #ffffff;
+    }
+
+    body.dark {
+      --bg: #000000;
+      --text: #ffffff;
+      --secondary: #aaaaaa;
+      --border: #292929;
+      --button-bg: #ffffff;
+      --button-text: #000000;
+    }
+
     body {
       min-height: 100vh;
       min-height: 100dvh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      overflow-x: hidden;
-      font-family: Inter, system-ui, -apple-system, sans-serif;
-      color: var(--text);
       background: var(--bg);
-      transition: background 0.4s, color 0.4s;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      transition: background 0.3s, color 0.3s;
     }
 
-    .orb {
-      position: fixed;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.27;
-      pointer-events: none;
-      background: var(--accent);
-      animation: float 9s ease-in-out infinite alternate;
-    }
-
-    .orb.one {
-      top: -160px;
-      left: -120px;
-    }
-
-    .orb.two {
-      right: -150px;
-      bottom: -170px;
-      background: #ec83c6;
-      animation-delay: -4s;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 850px;
-      position: relative;
-      z-index: 1;
-    }
-
-    nav {
+    header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-      padding: 0 4px;
+      padding: 28px 8%;
+      border-bottom: 1px solid var(--border);
     }
 
     .logo {
-      font-size: 1rem;
+      font-size: 20px;
       font-weight: 800;
-      letter-spacing: -0.5px;
+      letter-spacing: -1px;
     }
 
-    .logo span {
-      color: var(--accent);
-    }
-
-    .theme-btn {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 11px 16px;
+    .theme-button {
+      padding: 10px 16px;
+      background: transparent;
+      color: var(--text);
       border: 1px solid var(--border);
       border-radius: 30px;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 0.85rem;
+      font-size: 13px;
       cursor: pointer;
-      transition: transform 0.2s, background 0.3s;
+      transition: 0.2s;
     }
 
-    .theme-btn:hover {
-      transform: translateY(-2px);
+    .theme-button:hover {
+      background: var(--text);
+      color: var(--bg);
     }
 
-    .card {
-      position: relative;
-      overflow: hidden;
-      padding: clamp(32px, 8vw, 76px) clamp(24px, 7vw, 68px);
-      border: 1px solid var(--border);
-      border-radius: 32px;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      animation: appear 0.8s ease both;
+    main {
+      min-height: calc(100vh - 145px);
+      min-height: calc(100dvh - 145px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 80px 12%;
     }
 
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 9px 14px;
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      letter-spacing: 0.5px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #36c98f;
-      box-shadow: 0 0 12px #36c98f80;
+    .subtitle {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin-bottom: 28px;
     }
 
     h1 {
-      margin-top: 30px;
-      font-size: clamp(2.8rem, 9vw, 6.4rem);
-      font-weight: 850;
-      line-height: 1.02;
-      letter-spacing: -0.075em;
+      font-size: clamp(52px, 10vw, 120px);
+      line-height: 0.95;
+      letter-spacing: -0.08em;
+      font-weight: 800;
     }
 
     h1 span {
       display: block;
-      color: var(--accent);
-      background: linear-gradient(110deg, var(--accent), #df83d0);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin-top: 12px;
+      -webkit-text-stroke: 1.5px var(--text);
+      color: transparent;
     }
 
     .description {
-      max-width: 440px;
-      margin-top: 24px;
-      color: var(--muted);
-      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      max-width: 390px;
+      margin-top: 30px;
+      color: var(--secondary);
+      font-size: 16px;
       line-height: 1.8;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 14px;
-      margin-top: 34px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 50px;
-      padding: 0 23px;
-      border-radius: 14px;
-      font: inherit;
-      font-size: 0.92rem;
-      font-weight: 650;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn:hover {
-      transform: translateY(-3px);
-    }
-
-    .primary {
-      color: white;
-      background: linear-gradient(135deg, #7762f6, #9b73ed);
-      border: none;
-      box-shadow: 0 8px 25px #7762f635;
-    }
-
-    .secondary {
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--border);
+    .line {
+      width: 55px;
+      height: 2px;
+      background: var(--text);
+      margin-top: 35px;
     }
 
     footer {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      padding: 22px 5px 0;
-      color: var(--muted);
-      font-size: 0.78rem;
+      padding: 22px 8%;
+      border-top: 1px solid var(--border);
+      color: var(--secondary);
+      font-size: 12px;
     }
 
-    footer span:last-child {
-      letter-spacing: 1px;
-    }
+    @media (max-width: 600px) {
+      header {
+        padding: 22px 6%;
+      }
 
-    @keyframes appear {
-      from { opacity: 0; transform: translateY(22px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+      main {
+        padding: 70px 8%;
+      }
 
-    @keyframes float {
-      from { transform: translate(0, 0); }
-      to { transform: translate(40px, 35px); }
-    }
+      h1 {
+        font-size: clamp(52px, 13vw, 78px);
+      }
 
-    @media (max-width: 480px) {
-      body { padding: 16px; }
-      .card { border-radius: 24px; }
-      nav { margin-bottom: 18px; }
-      .actions { flex-direction: column; align-items: stretch; }
-      .btn { width: 100%; }
-      footer { font-size: 0.72rem; }
-      .orb { width: 240px; height: 240px; }
+      .description {
+        font-size: 14px;
+      }
+
+      footer {
+        padding: 20px 6%;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
+        transition: none !important;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="orb one"></div>
-  <div class="orb two"></div>
+  <header>
+    <div class="logo">ALEX.</div>
+    <button class="theme-button" id="themeToggle">
+      Tema scuro
+    </button>
+  </header>
 
-  <main class="container">
-    <nav>
-      <div class="logo">alex<span>.</span></div>
+  <main>
+    <p class="subtitle">Benvenuto nel mio spazio</p>
 
-      <button class="theme-btn" id="themeToggle"
-              aria-label="Cambia tema" aria-pressed="false">
-        <span id="themeIcon">🌙</span>
-        <span id="themeLabel">Tema scuro</span>
-      </button>
-    </nav>
+    <h1>
+      Ciao, sono
+      <span>Alex.</span>
+    </h1>
 
-    <section class="card">
-      <div class="tag">
-        <span class="dot"></span>
-        ONLINE · BENVENUTO
-      </div>
+    <p class="description">
+      Semplicità, creatività e attenzione ai dettagli.
+      Questo è il mio spazio, essenziale proprio come piace a me.
+    </p>
 
-      <h1>
-        Ciao, sono
-        <span>Alex.</span>
-      </h1>
-
-      <p class="description">
-        Benvenuto nel mio piccolo spazio digitale.
-        Design moderno, idee creative e un tocco di personalità.
-        Felice di averti qui!
-      </p>
-
-      <div class="actions">
-        <a class="btn primary" href="#contatti"
-           onclick="document.getElementById('message').textContent =
-           'Grazie per essere passato! ✨'; return false;">
-          Scopri di più <span>↗</span>
-        </a>
-
-        <button class="btn secondary" id="helloBtn">
-          👋 Salutami
-        </button>
-      </div>
-
-      <p id="message" aria-live="polite"
-         style="margin-top: 20px; color: var(--accent);"></p>
-    </section>
-
-    <footer>
-      <span>© 2026 · Creato con passione</span>
-      <span>DESIGN · CREATIVITY · ALEX</span>
-    </footer>
+    <div class="line"></div>
   </main>
 
+  <footer>
+    <span>© 2026 Alex</span>
+    <span>MINIMAL DESIGN</span>
+  </footer>
+
   <script>
-    const body = document.body;
-    const toggle = document.getElementById('themeToggle');
-    const icon = document.getElementById('themeIcon');
-    const label = document.getElementById('themeLabel');
-    const message = document.getElementById('message');
+    const button = document.getElementById("themeToggle");
 
-    toggle.addEventListener('click', () => {
-      const isDark = body.classList.toggle('dark');
+    button.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
 
-      icon.textContent = isDark ? '☀️' : '🌙';
-      label.textContent = isDark ? 'Tema chiaro' : 'Tema scuro';
-      toggle.setAttribute('aria-pressed', String(isDark));
-    });
-
-    document.getElementById('helloBtn').addEventListener('click', () => {
-      message.textContent = 'Ehi! 👋 Piacere di conoscerti!';
+      button.textContent =
+        document.body.classList.contains("dark")
+          ? "Tema chiaro"
+          : "Tema scuro";
     });
   </script>
 </body>
