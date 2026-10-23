@@ -3,183 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#000000">
-  <title>Alex.</title>
-
+  <title>Ciao sono Alex</title>
+  <!-- Importazione di un font elegante da Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  
   <style>
+    /* Reset di base */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* Definizione dei colori */
+    :root {
+      --bg-color: #0b0b0b;          /* Nero profondo */
+      --card-bg: #141414;           /* Nero/Grigio molto scuro per contrasto */
+      --primary-red: #8b0016;       /* Rosso scuro elegante */
+      --accent-red: #a3122b;        /* Rosso leggermente più luminoso per sfumature/hover */
+      --text-white: #f5f5f5;        /* Bianco morbido */
+      --text-muted: #a0a0a0;        /* Grigio chiaro per dettagli */
+    }
+
     body {
-      background: #000;
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-white);
+      font-family: 'Montserrat', sans-serif;
       min-height: 100vh;
-      min-height: 100dvh;
-    }
-
-    .page {
-      min-height: 100vh;
-      min-height: 100dvh;
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 32px 7%;
       display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
-
-    .edition {
-      font-size: 10px;
-      color: #777;
-      letter-spacing: 2px;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
       justify-content: center;
-      padding: 90px 0;
-    }
-
-    .label {
-      font-size: 10px;
-      color: #888;
-      letter-spacing: 4px;
-      margin-bottom: 30px;
-    }
-
-    h1 {
-      font-size: clamp(68px, 13vw, 180px);
-      font-weight: 700;
-      letter-spacing: -0.09em;
-      line-height: 0.88;
-    }
-
-    h1 span {
-      display: block;
-      margin-top: 12px;
-    }
-
-    .outline {
-      color: transparent;
-      -webkit-text-stroke: 1px #fff;
-    }
-
-    .details {
-      margin-top: 60px;
-      max-width: 360px;
-    }
-
-    .line {
-      width: 100%;
-      height: 1px;
-      background: #292929;
-      margin-bottom: 22px;
-    }
-
-    .description {
-      font-size: 13px;
-      color: #888;
-      line-height: 1.9;
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-top: 20px;
-      border-top: 1px solid #222;
-      color: #777;
-      font-size: 10px;
-      letter-spacing: 1.5px;
+      overflow: hidden;
+      position: relative;
     }
 
-    @media (max-width: 600px) {
-      .page {
-        padding: 25px 7%;
-      }
-
-      .edition {
-        font-size: 9px;
-      }
-
-      h1 {
-        font-size: clamp(64px, 14vw, 95px);
-      }
-
-      main {
-        padding: 70px 0;
-      }
-
-      .details {
-        margin-top: 45px;
-      }
+    /* Effetto sfocato di sfondo in rosso scuro */
+    .glow-background {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, var(--primary-red) 0%, rgba(0,0,0,0) 70%);
+      opacity: 0.25;
+      filter: blur(80px);
+      z-index: 1;
+      border-radius: 50%;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      main {
-        animation: reveal 1s ease both;
-      }
+    /* Card principale */
+    .card {
+      position: relative;
+      z-index: 2;
+      background-color: var(--card-bg);
+      padding: 3rem 4rem;
+      border-radius: 16px;
+      border: 1px solid rgba(139, 0, 22, 0.4); /* Bordo sottile rosso scuro */
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8),
+                  0 0 20px rgba(139, 0, 22, 0.15);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-      @keyframes reveal {
-        from {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9),
+                  0 0 25px rgba(163, 18, 43, 0.25);
+    }
+
+    /* Sottotitolo/Accetto sopra */
+    .subtitle {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--accent-red);
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* Titolo Principale */
+    h1 {
+      font-family: 'Cinzel', serif; /* Font elegante e classico */
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-white);
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Dettaglio stilistico (linea rossa elegante) */
+    .divider {
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+      margin: 0 auto;
     }
   </style>
 </head>
-
 <body>
-  <div class="page">
-    <header>
-      <div class="logo">A.</div>
-      <div class="edition">PERSONAL SPACE / 001</div>
-    </header>
 
-    <main>
-      <p class="label">BENVENUTO NEL MIO MONDO</p>
+  <!-- Bagliore soft di sfondo -->
+  <div class="glow-background"></div>
 
-      <h1>
-        Ciao,
-        <span class="outline">sono Alex.</span>
-      </h1>
-
-      <div class="details">
-        <div class="line"></div>
-        <p class="description">
-          Poche parole.<br>
-          Idee chiare.<br>
-          Essenziale, sempre.
-        </p>
-      </div>
-    </main>
-
-    <footer>
-      <span>© ALEX 2026</span>
-      <span>LESS IS MORE.</span>
-    </footer>
+  <!-- Contenitore centrale -->
+  <div class="card">
+    <p class="subtitle">Benvenuto</p>
+    <h1>Ciao, sono Alex</h1>
+    <div class="divider"></div>
   </div>
+
 </body>
 </html>
