@@ -642,10 +642,10 @@
         </div>
 
         <div class="filter-tags" id="filterContainer">
-          <button class="filter-btn active" data-filter="all">Tutti</button>
-          <button class="filter-btn" data-filter="Default">Default</button>
-          <button class="filter-btn" data-filter="Incompleto">Incompleto</button>
-          <button class="filter-btn" data-filter="Completo">Completo</button>
+          <button class="filter-btn active" data-filter="all">Tutti (0)</button>
+          <button class="filter-btn" data-filter="Default">Default (0)</button>
+          <button class="filter-btn" data-filter="Incompleto">Incompleto (0)</button>
+          <button class="filter-btn" data-filter="Completo">Completo (0)</button>
         </div>
       </div>
 
@@ -721,6 +721,23 @@
     </div>
   </div>
 
+  <!-- Modale Conferma Eliminazione -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-card" style="max-width: 420px; text-align: center;">
+      <div class="modal-header" style="justify-content: center; margin-bottom: 1rem;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: var(--red-accent);"></i>
+      </div>
+      <h3 class="modal-title" style="margin-bottom: 0.8rem;">Conferma Eliminazione</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.8rem;">
+        Sei sicuro di voler eliminare questo lavoro? L'azione non potrà essere annullata.
+      </p>
+      <div class="modal-footer" style="justify-content: center; gap: 1rem;">
+        <button type="button" class="btn-secondary" id="cancelDeleteBtn">Annulla</button>
+        <button type="button" class="btn-primary" id="confirmDeleteBtn" style="background: linear-gradient(135deg, #a3122b 0%, #ff4d4d 100%); border-color: #ff4d4d;">Sì, Elimina</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <p>&copy; 2026 Alexandru Ricardo Mihalache. Tutti i diritti riservati.</p>
   </footer>
@@ -729,6 +746,7 @@
     let projects = [];
     let activeFilter = 'all';
     let searchQuery = '';
+    let projectToDeleteId = null;
 
     let ghConfig = JSON.parse(localStorage.getItem('gh_sync_config')) || { token: '', repo: '', path: 'projects.json' };
 
@@ -753,6 +771,11 @@
     const ghTokenInput = document.getElementById('ghToken');
     const ghRepoInput = document.getElementById('ghRepo');
     const syncStatus = document.getElementById('syncStatus');
+
+    // Elementi modale eliminazione
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
     // Gestione apertura/chiusura modale configurazione
     configBtn.addEventListener('click', () => {
@@ -867,7 +890,30 @@
       renderProjects();
     }
 
+    // Aggiorna il numero di progetti tra parentesi sui tasti filtro
+    function updateFilterCounts() {
+      const total = projects.length;
+      const countDefault = projects.filter(p => p.category === 'Default').length;
+      const countIncompleto = projects.filter(p => p.category === 'Incompleto').length;
+      const countCompleto = projects.filter(p => p.category === 'Completo').length;
+
+      const buttons = filterContainer.querySelectorAll('.filter-btn');
+      buttons.forEach(btn => {
+        const filterType = btn.getAttribute('data-filter');
+        if (filterType === 'all') {
+          btn.textContent = `Tutti (${total})`;
+        } else if (filterType === 'Default') {
+          btn.textContent = `Default (${countDefault})`;
+        } else if (filterType === 'Incompleto') {
+          btn.textContent = `Incompleto (${countIncompleto})`;
+        } else if (filterType === 'Completo') {
+          btn.textContent = `Completo (${countCompleto})`;
+        }
+      });
+    }
+
     function renderProjects() {
+      updateFilterCounts();
       projectsGrid.innerHTML = '';
 
       const filtered = projects.filter(project => {
@@ -902,7 +948,7 @@
           <div>
             <div class="card-top">
               <span class="category-badge">${escapeHtml(project.category)}</span>
-              <button class="btn-delete" title="Elimina Lavoro" onclick="deleteProject('${project.id}', event)">
+              <button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -975,13 +1021,30 @@
       toggleModal(true);
     }
 
-    window.deleteProject = function(id, event) {
+    // Gestione eliminazione con Modale Custom
+    window.promptDeleteProject = function(id, event) {
       event.stopPropagation();
-      if (confirm('Sei sicuro di voler eliminare questo lavoro?')) {
-        projects = projects.filter(p => p.id !== id);
+      projectToDeleteId = id;
+      deleteModal.classList.add('active');
+    };
+
+    function closeDeleteModal() {
+      projectToDeleteId = null;
+      deleteModal.classList.remove('active');
+    }
+
+    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+    deleteModal.addEventListener('click', (e) => {
+      if (e.target === deleteModal) closeDeleteModal();
+    });
+
+    confirmDeleteBtn.addEventListener('click', () => {
+      if (projectToDeleteId) {
+        projects = projects.filter(p => p.id !== projectToDeleteId);
+        closeDeleteModal();
         saveToGitHub();
       }
-    };
+    });
 
     function toggleModal(show) {
       if (show) {
