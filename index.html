@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ciao, sono Alex | Portfolio Interattivo</title>
   
-  <!-- Google Fonts & FontAwesome per icone -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* Reset Generale e Variabili di Stile */
     * {
       margin: 0;
       padding: 0;
@@ -45,7 +43,6 @@
       flex-direction: column;
     }
 
-    /* Bagliori Sfondo */
     .bg-glow-1 {
       position: fixed;
       top: -120px;
@@ -70,13 +67,12 @@
       pointer-events: none;
     }
 
-    /* Header minimale con solo Logo */
     header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 1.5rem 6%;
+      padding: 1.2rem 6%;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -84,6 +80,8 @@
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-red);
       z-index: 100;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .logo {
@@ -104,7 +102,37 @@
       text-shadow: 0 0 10px var(--red-accent);
     }
 
-    /* Hero Section */
+    .header-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .btn-sync {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-sync:hover {
+      background: var(--red-deep);
+      border-color: var(--red-accent);
+    }
+
+    .sync-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
     .hero {
       padding-top: 10rem;
       padding-bottom: 4rem;
@@ -148,7 +176,6 @@
       margin-bottom: 2rem;
     }
 
-    /* Sezione Portfolio e Controlli di Ricerca */
     .portfolio-section {
       max-width: 1200px;
       margin: 0 auto;
@@ -183,7 +210,6 @@
       margin: 0.8rem auto 0;
     }
 
-    /* Barra di Controllo (Ricerca + Bottone Aggiungi) */
     .controls-bar {
       display: flex;
       width: 100%;
@@ -256,7 +282,6 @@
       transform: translateY(-2px);
     }
 
-    /* Filtri Categoria */
     .filter-tags {
       display: flex;
       gap: 0.5rem;
@@ -283,7 +308,6 @@
       border-color: var(--red-accent);
     }
 
-    /* Griglia Carte Lavori */
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -301,7 +325,7 @@
       transition: all 0.35s ease;
       position: relative;
       overflow: hidden;
-      cursor: pointer; /* Indica che la card è cliccabile */
+      cursor: pointer;
     }
 
     .project-card::before {
@@ -409,7 +433,6 @@
       transform: translateX(4px);
     }
 
-    /* Stato Vuoto Nessun Risultato */
     .empty-state {
       text-align: center;
       padding: 4rem 1rem;
@@ -424,7 +447,6 @@
       opacity: 0.6;
     }
 
-    /* Form Modale */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -551,7 +573,6 @@
       border-color: var(--text-muted);
     }
 
-    /* Footer */
     footer {
       text-align: center;
       padding: 2.5rem 1rem;
@@ -564,7 +585,6 @@
       margin-top: auto;
     }
 
-    /* Responsive */
     @media (max-width: 600px) {
       .controls-bar {
         flex-direction: column;
@@ -576,21 +596,28 @@
       .modal-card {
         padding: 1.8rem;
       }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Bagliori Sfondo -->
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
-  <!-- Header solo Logo -->
   <header>
     <a href="#" class="logo">Alexandru R. M.<span>.</span></a>
+    <div class="header-actions">
+      <span class="sync-status" id="syncStatus">Stato: Locale</span>
+      <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
+        <i class="fa-solid fa-gear"></i> Configura GitHub
+      </button>
+    </div>
   </header>
 
-  <!-- Hero Section -->
   <main>
     <section class="hero">
       <p class="hero-subtitle">Portfolio & Showcase Progetti</p>
@@ -600,12 +627,10 @@
       </p>
     </section>
 
-    <!-- Sezione Lavori e Ricerca -->
     <section class="portfolio-section">
       <div class="section-header">
         <h2 class="section-title">I Miei Lavori</h2>
         
-        <!-- Controls Bar: Ricerca e Bottone Aggiungi -->
         <div class="controls-bar">
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -616,23 +641,19 @@
           </button>
         </div>
 
-        <!-- Filtri per Categoria -->
         <div class="filter-tags" id="filterContainer">
           <button class="filter-btn active" data-filter="all">Tutti</button>
           <button class="filter-btn" data-filter="Default">Default</button>
-          <button class="filter-btn" data-filter="Incompleto">Incompleto</button>
-          <button class="filter-btn" data-filter="Completo">Completo</button>
+          <button class="filter-btn" data-filter="Incompleti">Incompleti</button>
+          <button class="filter-btn" data-filter="Completi">Completi</button>
         </div>
       </div>
 
-      <!-- Griglia Progetti -->
-      <div class="projects-grid" id="projectsGrid">
-        <!-- Generati Dinamicamente con JS -->
-      </div>
+      <div class="projects-grid" id="projectsGrid"></div>
     </section>
   </main>
 
-  <!-- Modale Aggiungi Lavoro -->
+  <!-- Modale Aggiungi/Modifica Lavoro -->
   <div class="modal-overlay" id="workModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -651,19 +672,19 @@
           <label class="form-label" for="workCategory">Stato / Categoria *</label>
           <select id="workCategory" class="form-select" required>
             <option value="Default" style="background: #121212;">Default</option>
-            <option value="Incompleto" style="background: #121212;">Incompleto</option>
-            <option value="Completo" style="background: #121212;">Completo</option>
+            <option value="Incompleti" style="background: #121212;">Incompleti</option>
+            <option value="Completi" style="background: #121212;">Completi</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="workUrl">URL del Progetto (Link Futuro) *</label>
-          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com/pagina-futura" required>
+          <label class="form-label" for="workUrl">URL del Progetto *</label>
+          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="workDesc">Descrizione Breve *</label>
-          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto in poche righe..." required></textarea>
+          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto..." required></textarea>
         </div>
 
         <div class="modal-footer">
@@ -674,19 +695,18 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer>
     <p>&copy; 2026 Alexandru Ricardo Mihalache. Tutti i diritti riservati.</p>
   </footer>
 
-  <!-- Script JS Interattivo -->
   <script>
-    // Stato dell'applicazione (inizialmente vuoto senza lavori predefiniti)
-    let projects = JSON.parse(localStorage.getItem('alex_projects_v3')) || [];
+    let projects = [];
     let activeFilter = 'all';
     let searchQuery = '';
 
-    // Elementi DOM
+    // Configurazione GitHub salvata nel browser
+    let ghConfig = JSON.parse(localStorage.getItem('gh_sync_config')) || { token: '', repo: '', path: 'projects.json' };
+
     const projectsGrid = document.getElementById('projectsGrid');
     const searchInput = document.getElementById('searchInput');
     const filterContainer = document.getElementById('filterContainer');
@@ -698,17 +718,109 @@
     const modalTitleText = document.getElementById('modalTitleText');
     const saveBtnText = document.getElementById('saveBtnText');
     const editProjectId = document.getElementById('editProjectId');
+    const configBtn = document.getElementById('configBtn');
+    const syncStatus = document.getElementById('syncStatus');
 
-    // Salva nel LocalStorage
-    function saveProjects() {
-      localStorage.setItem('alex_projects_v3', JSON.stringify(projects));
+    // Configura credenziali GitHub
+    configBtn.addEventListener('click', () => {
+      const token = prompt("Inserisci il tuo GitHub Personal Access Token (PAT):", ghConfig.token);
+      if (token === null) return;
+      const repo = prompt("Inserisci il nome del repository (es: tuo-username/tuo-repo):", ghConfig.repo || "tuo-username/tuo-repo");
+      if (repo === null) return;
+
+      ghConfig = { token: token.trim(), repo: repo.trim(), path: 'projects.json' };
+      localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+      alert("Configurazione salvata! Ora i dati si sincronizzeranno con GitHub.");
+      loadProjectsFromGitHub();
+    });
+
+    // Carica i dati da GitHub o LocalStorage
+    async function init() {
+      if (ghConfig.token && ghConfig.repo) {
+        await loadProjectsFromGitHub();
+      } else {
+        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+        syncStatus.textContent = "Stato: Modalità Locale (Configura GitHub in alto)";
+        renderProjects();
+      }
     }
 
-    // Renderizza i Lavori
+    async function loadProjectsFromGitHub() {
+      syncStatus.textContent = "Stato: Caricamento da GitHub...";
+      try {
+        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
+        const res = await fetch(url, {
+          headers: { 'Authorization': `token ${ghConfig.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const decoded = JSON.parse(atob(data.content));
+          projects = decoded;
+          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
+        } else {
+          projects = [];
+          syncStatus.textContent = "Stato: File projects.json non trovato (verrà creato al primo salvataggio)";
+        }
+      } catch (err) {
+        syncStatus.textContent = "Stato: Errore connessione GitHub ❌";
+        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+      }
+      renderProjects();
+    }
+
+    async function saveToGitHub() {
+      localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+      
+      if (!ghConfig.token || !ghConfig.repo) {
+        renderProjects();
+        return;
+      }
+
+      syncStatus.textContent = "Stato: Salvataggio su GitHub in corso...";
+      try {
+        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
+        
+        // Prima recuperiamo lo SHA attuale del file (richiesto da GitHub per aggiornare i file)
+        let sha = '';
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `token ${ghConfig.token}` }
+        });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+        }
+
+        // Effettua il commit via API
+        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
+        const bodyData = {
+          message: "Aggiornamento portfolio via interfaccia web",
+          content: contentEncoded,
+          sha: sha || undefined
+        };
+
+        const putRes = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${ghConfig.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData)
+        });
+
+        if (putRes.ok) {
+          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
+        } else {
+          syncStatus.textContent = "Stato: Errore durante il commit ❌";
+        }
+      } catch (err) {
+        syncStatus.textContent = "Stato: Errore di rete durante il salvataggio ❌";
+      }
+      renderProjects();
+    }
+
     function renderProjects() {
       projectsGrid.innerHTML = '';
 
-      // Filtra per ricerca e categoria
       const filtered = projects.filter(project => {
         const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
         const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -731,7 +843,6 @@
       filtered.forEach(project => {
         const card = document.createElement('div');
         card.className = 'project-card';
-        // Cliccando sulla card (esclusi i bottoni interni) si apre la modifica del tag/lavoro
         card.addEventListener('click', (e) => {
           if (!e.target.closest('button') && !e.target.closest('a')) {
             openEditModal(project.id);
@@ -759,7 +870,6 @@
       });
     }
 
-    // Gestisci Aggiunta o Modifica Progetto
     function handleFormSubmit(e) {
       e.preventDefault();
       
@@ -772,7 +882,6 @@
       if (!title || !category || !url || !description) return;
 
       if (id) {
-        // Modifica esistente
         projects = projects.map(p => {
           if (p.id === id) {
             return { ...p, title, category, url, description };
@@ -780,7 +889,6 @@
           return p;
         });
       } else {
-        // Nuovo progetto
         const newProject = {
           id: Date.now().toString(),
           title,
@@ -791,12 +899,10 @@
         projects.unshift(newProject);
       }
 
-      saveProjects();
-      renderProjects();
+      saveToGitHub();
       closeModal();
     }
 
-    // Apri Modale per Creazione
     function openCreateModal() {
       addWorkForm.reset();
       editProjectId.value = '';
@@ -805,7 +911,6 @@
       toggleModal(true);
     }
 
-    // Apri Modale per Modifica
     function openEditModal(id) {
       const project = projects.find(p => p.id === id);
       if (!project) return;
@@ -821,17 +926,14 @@
       toggleModal(true);
     }
 
-    // Elimina Progetto
     window.deleteProject = function(id, event) {
       event.stopPropagation();
       if (confirm('Sei sicuro di voler eliminare questo lavoro?')) {
         projects = projects.filter(p => p.id !== id);
-        saveProjects();
-        renderProjects();
+        saveToGitHub();
       }
     };
 
-    // Apri/Chiudi Modale
     function toggleModal(show) {
       if (show) {
         workModal.classList.add('active');
@@ -846,7 +948,6 @@
       editProjectId.value = '';
     }
 
-    // Utility di sicurezza sanitizzazione HTML
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
@@ -859,7 +960,6 @@
       });
     }
 
-    // Event Listeners
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
       renderProjects();
@@ -878,15 +978,14 @@
     closeModalBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     
-    // Chiudi modale se si clicca fuori dalla scheda
     workModal.addEventListener('click', (e) => {
       if (e.target === workModal) closeModal();
     });
 
     addWorkForm.addEventListener('submit', handleFormSubmit);
 
-    // Inizializzazione al caricamento
-    renderProjects();
+    // Avvio dell'app
+    init();
   </script>
 </body>
 </html>
