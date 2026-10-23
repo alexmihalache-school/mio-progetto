@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alex $</title>
+  <meta name="theme-color" content="#000000">
+  <title>Alex.</title>
 
   <style>
     * {
@@ -12,32 +13,20 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --bg: #fff;
-      --fg: #000;
-      --line: #e5e5e5;
-    }
-
-    body.dark {
-      --bg: #000;
-      --fg: #fff;
-      --line: #292929;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--fg);
+      background: #000;
+      color: #fff;
       font-family: Arial, Helvetica, sans-serif;
       min-height: 100vh;
-      transition: background .3s, color .3s;
+      min-height: 100dvh;
     }
 
     .page {
       min-height: 100vh;
       min-height: 100dvh;
       max-width: 1600px;
-      margin: auto;
-      padding: 32px 6%;
+      margin: 0 auto;
+      padding: 32px 7%;
       display: flex;
       flex-direction: column;
     }
@@ -49,24 +38,15 @@
     }
 
     .logo {
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: -1px;
     }
 
-    button {
-      color: var(--fg);
-      background: none;
-      border: 1px solid var(--line);
-      padding: 10px 15px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    button:hover {
-      background: var(--fg);
-      color: var(--bg);
+    .edition {
+      font-size: 10px;
+      color: #777;
+      letter-spacing: 2px;
     }
 
     main {
@@ -74,78 +54,98 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 100px 0;
+      padding: 90px 0;
     }
 
-    .eyebrow {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin-bottom: 28px;
+    .label {
+      font-size: 10px;
+      color: #888;
+      letter-spacing: 4px;
+      margin-bottom: 30px;
     }
 
     h1 {
-      font-size: clamp(68px, 13.5vw, 190px);
-      font-weight: 800;
-      letter-spacing: -0.095em;
-      line-height: .82;
+      font-size: clamp(68px, 13vw, 180px);
+      font-weight: 700;
+      letter-spacing: -0.09em;
+      line-height: 0.88;
     }
 
     h1 span {
       display: block;
-      margin-top: 15px;
+      margin-top: 12px;
     }
 
-    .bottom {
-      margin-top: 48px;
-      width: 100%;
-      max-width: 430px;
+    .outline {
+      color: transparent;
+      -webkit-text-stroke: 1px #fff;
+    }
+
+    .details {
+      margin-top: 60px;
+      max-width: 360px;
     }
 
     .line {
-      height: 1px;
       width: 100%;
-      background: var(--line);
-      margin-bottom: 20px;
+      height: 1px;
+      background: #292929;
+      margin-bottom: 22px;
     }
 
     .description {
       font-size: 13px;
-      line-height: 1.8;
-      max-width: 290px;
+      color: #888;
+      line-height: 1.9;
     }
 
     footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid var(--line);
-      padding-top: 18px;
+      padding-top: 20px;
+      border-top: 1px solid #222;
+      color: #777;
       font-size: 10px;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
     }
 
     @media (max-width: 600px) {
       .page {
-        padding: 24px 7%;
+        padding: 25px 7%;
+      }
+
+      .edition {
+        font-size: 9px;
       }
 
       h1 {
-        font-size: clamp(64px, 15vw, 100px);
+        font-size: clamp(64px, 14vw, 95px);
       }
 
       main {
         padding: 70px 0;
       }
 
-      .bottom {
-        margin-top: 35px;
+      .details {
+        margin-top: 45px;
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        transition: none !important;
+    @media (prefers-reduced-motion: no-preference) {
+      main {
+        animation: reveal 1s ease both;
+      }
+
+      @keyframes reveal {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     }
   </style>
@@ -155,42 +155,31 @@
   <div class="page">
     <header>
       <div class="logo">A.</div>
-      <button id="theme">DARK MODE</button>
+      <div class="edition">PERSONAL SPACE / 001</div>
     </header>
 
     <main>
-      <p class="eyebrow">PERSONAL PAGE — 2026</p>
+      <p class="label">BENVENUTO NEL MIO MONDO</p>
 
       <h1>
         Ciao,
-        <span>sono Alex.</span>
+        <span class="outline">sono Alex.</span>
       </h1>
 
-      <div class="bottom">
+      <div class="details">
         <div class="line"></div>
         <p class="description">
-          Uno spazio personale.<br>
-          Nient'altro.
+          Poche parole.<br>
+          Idee chiare.<br>
+          Essenziale, sempre.
         </p>
       </div>
     </main>
 
     <footer>
-      <span>ALEX.</span>
-      <span>LESS, BUT BETTER.</span>
+      <span>© ALEX 2026</span>
+      <span>LESS IS MORE.</span>
     </footer>
   </div>
-
-  <script>
-    const btn = document.getElementById("theme");
-
-    btn.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-
-      btn.textContent = document.body.classList.contains("dark")
-        ? "LIGHT MODE"
-        : "DARK MODE";
-    });
-  </script>
 </body>
 </html>
