@@ -62,7 +62,7 @@
       pointer-events: none;
     }
 
-    /* Navbar elegante */
+    /* Header semplice senza link a destra */
     header {
       position: fixed;
       top: 0;
@@ -70,7 +70,7 @@
       width: 100%;
       padding: 1.5rem 5%;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       background: rgba(7, 7, 7, 0.85);
       backdrop-filter: blur(10px);
@@ -89,20 +89,6 @@
 
     .logo span {
       color: var(--red-accent);
-    }
-
-    nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-left: 2rem;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      transition: color 0.3s ease;
-    }
-
-    nav a:hover {
-      color: var(--text-main);
     }
 
     /* Hero Section (Schermo Intero) */
@@ -243,14 +229,9 @@
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
-  <!-- Intestazione / Navbar -->
+  <!-- Intestazione solo con Logo -->
   <header>
     <a href="#" class="logo">Alex<span>.</span></a>
-    <nav>
-      <a href="#about">Chi Sono</a>
-      <a href="#progetti">Progetti</a>
-      <a href="#contatti">Contatti</a>
-    </nav>
   </header>
 
   <!-- Hero Section a Schermo Intero -->
@@ -263,3 +244,34 @@
       </p>
       <a href="#about" class="btn">Scopri di più</a>
     </section>
+
+    <!-- Sezione "Chi Sono" & Progetti -->
+    <section id="about" class="section">
+      <h2 class="section-title">Cosa Faccio</h2>
+      
+      <div class="grid">
+        <div class="card">
+          <h3>Design Minimale</h3>
+          <p>Creazione di interfacce scure, eleganti e d'impatto visivo, orientate al massimo comfort visivo e alla raffinatezza.</p>
+        </div>
+
+        <div class="card">
+          <h3>Sviluppo Curato</h3>
+          <p>Codice pulito e strutturato per garantire elevate prestazioni, reattività e un'esperienza utente fluida su ogni dispositivo.</p>
+        </div>
+
+        <div class="card">
+          <h3>Visione e Strategia</h3>
+          <p>Progettazione di soluzioni su misura con attenzione al dettaglio e un focus particolare sull'identità visiva.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Alex. Tutti i diritti riservati.</p>
+  </footer>
+
+</body>
+</html>
