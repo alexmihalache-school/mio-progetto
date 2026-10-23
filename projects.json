@@ -4,6 +4,6 @@
     "title": "Anagrafica 1.0",
     "category": "Completo",
     "url": "https://alexmihalache-school.github.io/mio-progetto/Anagrafica.html",
-    "description": "Progetto scolastico focalizzato sullo sviluppo di un'interfaccia utente interattiva per la raccolta e la visualizzazione di dati anagrafici. L'applicazione comprende un form strutturato con campi di testo per nome, cognome, indirizzo e città, affiancato da un campo numerico dedicato all'età. Mediante l'azione di un pulsante, viene attivata una funzione JavaScript che sfrutta la manipolazione del DOM per inserire dinamicamente i dati inseriti all'interno di una tabella HTML tabellare in tempo reale."
+    "description": "Progetto scolastico basato sulla creazione di un'interfaccia interattiva per la raccolta di dati anagrafici tramite campi di testo e numerici. Attraverso la pressione di un pulsante, una funzione JavaScript sfrutta la manipolazione del DOM per inserire dinamicamente i dati all'interno di una tabella HTML in tempo reale."
   }
 ]
