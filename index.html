@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ciao, sono Alex</title>
-  <!-- Google Fonts -->
+  <title>Ciao, sono Alex | Portfolio Interattivo</title>
+  
+  <!-- Google Fonts & FontAwesome per icone -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* Reset generale e variabili */
+    /* Reset Generale e Variabili di Stile */
     * {
       margin: 0;
       padding: 0;
@@ -21,12 +23,15 @@
     :root {
       --bg-dark: #070707;
       --card-bg: #121212;
+      --input-bg: #1a1a1a;
       --red-deep: #8b0016;
       --red-accent: #a3122b;
+      --red-hover: #be1835;
       --red-glow: rgba(139, 0, 22, 0.35);
       --text-main: #f0f0f0;
-      --text-muted: #8a8a8a;
-      --border-red: rgba(139, 0, 22, 0.3);
+      --text-muted: #999999;
+      --border-red: rgba(139, 0, 22, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.08);
     }
 
     body {
@@ -35,13 +40,16 @@
       font-family: 'Montserrat', sans-serif;
       overflow-x: hidden;
       line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* Sfondi dinamici con bagliore rosso */
+    /* Bagliori Sfondo */
     .bg-glow-1 {
       position: fixed;
-      top: -100px;
-      left: -100px;
+      top: -120px;
+      left: -120px;
       width: 600px;
       height: 600px;
       background: radial-gradient(circle, var(--red-glow) 0%, rgba(0,0,0,0) 70%);
@@ -62,107 +70,107 @@
       pointer-events: none;
     }
 
-    /* Header semplice senza link a destra */
+    /* Header minimale con solo Logo */
     header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      padding: 1.5rem 5%;
+      padding: 1.5rem 6%;
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
       background: rgba(7, 7, 7, 0.85);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-red);
       z-index: 100;
     }
 
     .logo {
       font-family: 'Cinzel', serif;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: var(--text-main);
       letter-spacing: 2px;
       text-decoration: none;
+      transition: text-shadow 0.3s ease;
     }
 
     .logo span {
       color: var(--red-accent);
     }
 
-    /* Hero Section (Schermo Intero) */
+    .logo:hover {
+      text-shadow: 0 0 10px var(--red-accent);
+    }
+
+    /* Hero Section */
     .hero {
-      min-height: 100vh;
+      padding-top: 10rem;
+      padding-bottom: 4rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0 1rem;
       position: relative;
       z-index: 1;
     }
 
     .hero-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 6px;
       color: var(--red-accent);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.2rem;
       font-weight: 600;
     }
 
     .hero-title {
       font-family: 'Cinzel', serif;
-      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-size: clamp(2.5rem, 7vw, 5rem);
       font-weight: 900;
       letter-spacing: 2px;
       margin-bottom: 1rem;
-      text-shadow: 0 0 30px rgba(0,0,0,0.9);
+      text-shadow: 0 0 35px rgba(0,0,0,0.9);
+      background: linear-gradient(180deg, #ffffff 0%, #cfcfcf 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .hero-description {
-      max-width: 600px;
+      max-width: 650px;
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 300;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 0.9rem 2.5rem;
-      border: 1px solid var(--red-accent);
-      background: rgba(139, 0, 22, 0.15);
-      color: var(--text-main);
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-size: 0.85rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 15px rgba(139, 0, 22, 0.2);
-    }
-
-    .btn:hover {
-      background: var(--red-deep);
-      box-shadow: 0 0 25px rgba(163, 18, 43, 0.5);
-      transform: translateY(-2px);
-    }
-
-    /* Sezione Contenuti (Griglia) */
-    .section {
-      padding: 6rem 5%;
+    /* Sezione Portfolio e Controlli di Ricerca */
+    .portfolio-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem 6rem 1.5rem;
+      width: 100%;
       position: relative;
       z-index: 1;
+      flex: 1;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 3rem;
+      gap: 1.5rem;
     }
 
     .section-title {
       font-family: 'Cinzel', serif;
       font-size: 2rem;
       text-align: center;
-      margin-bottom: 3rem;
       position: relative;
     }
 
@@ -175,103 +183,684 @@
       margin: 0.8rem auto 0;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
+    /* Barra di Controllo (Ricerca + Bottone Aggiungi) */
+    .controls-bar {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(18, 18, 18, 0.7);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-red);
+      backdrop-filter: blur(8px);
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-red);
-      padding: 2.5rem;
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.8rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
       transition: all 0.3s ease;
     }
 
-    .card:hover {
-      transform: translateY(-8px);
+    .search-input:focus {
+      outline: none;
       border-color: var(--red-accent);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(139, 0, 22, 0.2);
+      box-shadow: 0 0 10px rgba(163, 18, 43, 0.3);
     }
 
-    .card h3 {
-      font-family: 'Cinzel', serif;
-      font-size: 1.3rem;
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1.8rem;
+      border: 1px solid var(--red-accent);
+      background: linear-gradient(135deg, var(--red-deep) 0%, var(--red-accent) 100%);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(139, 0, 22, 0.3);
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--red-accent) 0%, var(--red-hover) 100%);
+      box-shadow: 0 6px 20px rgba(163, 18, 43, 0.5);
+      transform: translateY(-2px);
+    }
+
+    /* Filtri Categoria */
+    .filter-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .filter-btn {
+      padding: 0.4rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--red-deep);
+      color: var(--text-main);
+      border-color: var(--red-accent);
+    }
+
+    /* Griglia Carte Lavori */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-red);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--red-accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--red-accent);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(139, 0, 22, 0.25);
+    }
+
+    .project-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
       margin-bottom: 1rem;
+    }
+
+    .category-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--red-accent);
+      background: rgba(163, 18, 43, 0.15);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid rgba(163, 18, 43, 0.3);
+      font-weight: 600;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .btn-delete:hover {
+      color: #ff4d4d;
+    }
+
+    .project-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
       color: var(--text-main);
     }
 
-    .card p {
+    .project-description {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 300;
+      margin-bottom: 2rem;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1.2rem;
+    }
+
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.3s ease;
+    }
+
+    .project-link i {
+      color: var(--red-accent);
+      transition: transform 0.3s ease;
+    }
+
+    .project-link:hover {
+      color: var(--red-accent);
+    }
+
+    .project-link:hover i {
+      transform: translateX(4px);
+    }
+
+    /* Stato Vuoto Nessun Risultato */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      grid-column: 1 / -1;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--red-deep);
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    /* Form Modale */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-red);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(139, 0, 22, 0.2);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .btn-close:hover {
+      color: var(--text-main);
+    }
+
+    .form-group {
+      margin-bottom: 1.3rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--red-accent);
+      box-shadow: 0 0 10px rgba(163, 18, 43, 0.3);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-secondary {
+      padding: 0.8rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: 'Montserrat', sans-serif;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      color: var(--text-main);
+      border-color: var(--text-muted);
     }
 
     /* Footer */
     footer {
       text-align: center;
-      padding: 3rem 1rem;
+      padding: 2.5rem 1rem;
       border-top: 1px solid var(--border-red);
       color: var(--text-muted);
       font-size: 0.85rem;
       position: relative;
       z-index: 1;
       background: #050505;
+      margin-top: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .controls-bar {
+        flex-direction: column;
+      }
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+      .modal-card {
+        padding: 1.8rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Bagliori di Sfondo -->
+  <!-- Bagliori Sfondo -->
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
-  <!-- Intestazione solo con Logo -->
+  <!-- Header solo Logo -->
   <header>
     <a href="#" class="logo">Alex<span>.</span></a>
   </header>
 
-  <!-- Hero Section a Schermo Intero -->
+  <!-- Hero Section -->
   <main>
     <section class="hero">
-      <p class="hero-subtitle">Portfolio & Profilo Personale</p>
+      <p class="hero-subtitle">Portfolio & Showcase Progetti</p>
       <h1 class="hero-title">Ciao, sono Alex</h1>
       <p class="hero-description">
-        Benvenuto nel mio spazio digitale. Unisco passione, estetica e minimalismo per creare esperienze uniche e curate nei dettagli.
+        Benvenuto nel mio spazio digitale. Esplora i miei lavori recenti, filtra le competenze o aggiungi nuovi progetti da mostrare al mondo.
       </p>
-      <a href="#about" class="btn">Scopri di più</a>
     </section>
 
-    <!-- Sezione "Chi Sono" & Progetti -->
-    <section id="about" class="section">
-      <h2 class="section-title">Cosa Faccio</h2>
-      
-      <div class="grid">
-        <div class="card">
-          <h3>Design Minimale</h3>
-          <p>Creazione di interfacce scure, eleganti e d'impatto visivo, orientate al massimo comfort visivo e alla raffinatezza.</p>
+    <!-- Sezione Lavori e Ricerca -->
+    <section class="portfolio-section">
+      <div class="section-header">
+        <h2 class="section-title">I Miei Lavori</h2>
+        
+        <!-- Controls Bar: Ricerca e Bottone Aggiungi -->
+        <div class="controls-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione...">
+          </div>
+          <button class="btn-primary" id="openModalBtn">
+            <i class="fa-solid fa-plus"></i> Nuovo Lavoro
+          </button>
         </div>
 
-        <div class="card">
-          <h3>Sviluppo Curato</h3>
-          <p>Codice pulito e strutturato per garantire elevate prestazioni, reattività e un'esperienza utente fluida su ogni dispositivo.</p>
+        <!-- Filtri per Categoria -->
+        <div class="filter-tags" id="filterContainer">
+          <button class="filter-btn active" data-filter="all">Tutti</button>
+          <button class="filter-btn" data-filter="Web Design">Web Design</button>
+          <button class="filter-btn" data-filter="Sviluppo">Sviluppo</button>
+          <button class="filter-btn" data-filter="Branding">Branding</button>
+          <button class="filter-btn" data-filter="UI/UX">UI/UX</button>
         </div>
+      </div>
 
-        <div class="card">
-          <h3>Visione e Strategia</h3>
-          <p>Progettazione di soluzioni su misura con attenzione al dettaglio e un focus particolare sull'identità visiva.</p>
-        </div>
+      <!-- Griglia Progetti -->
+      <div class="projects-grid" id="projectsGrid">
+        <!-- Generati Dinamicamente con JS -->
       </div>
     </section>
   </main>
+
+  <!-- Modale Aggiungi Lavoro -->
+  <div class="modal-overlay" id="workModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Aggiungi Nuovo Lavoro</h3>
+        <button class="btn-close" id="closeModalBtn">&times;</button>
+      </div>
+      <form id="addWorkForm">
+        <div class="form-group">
+          <label class="form-label" for="workTitle">Titolo del Progetto *</label>
+          <input type="text" id="workTitle" class="form-input" placeholder="Es. E-commerce di Lusso" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="workCategory">Categoria *</label>
+
+          <select id="workCategory" class="form-select" required>
+            <option value="Web Design" style="background: #121212;">Web Design</option>
+            <option value="Sviluppo" style="background: #121212;">Sviluppo</option>
+            <option value="Branding" style="background: #121212;">Branding</option>
+            <option value="UI/UX" style="background: #121212;">UI/UX</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="workUrl">URL del Progetto (Link Futuro) *</label>
+          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com/pagina-futura" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="workDesc">Descrizione Breve *</label>
+          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto in poche righe..." required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelBtn">Annulla</button>
+          <button type="submit" class="btn-primary">Salva Lavoro</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer>
     <p>&copy; 2026 Alex. Tutti i diritti riservati.</p>
   </footer>
 
+  <!-- Script JS Interattivo -->
+  <script>
+    // Dati Predefiniti Iniziali (se LocalStorage è vuoto)
+    const defaultProjects = [
+      {
+        id: '1',
+        title: 'Design Minimalista Scuro',
+        category: 'Web Design',
+        url: 'https://github.com',
+        description: 'Interfaccia utente moderna realizzata per un brand d’alta moda con animazioni fluide e contrasti eleganti in rosso rubino.'
+      },
+      {
+        id: '2',
+        title: 'Piattaforma Web App',
+        category: 'Sviluppo',
+        url: 'https://google.com',
+        description: 'Applicazione web ad alte prestazioni focalizzata sulla reattività e sulla gestione ottimizzata dei dati locali.'
+      },
+      {
+        id: '3',
+        title: 'Identità Visiva Red Luxury',
+        category: 'Branding',
+        url: 'https://behance.net',
+        description: 'Studio completo del brand, palette colori, tipografia custom e linee guida per prodotti digitali esclusivi.'
+      }
+    ];
+
+    // Stato dell'applicazione
+    let projects = JSON.parse(localStorage.getItem('alex_projects')) || defaultProjects;
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    // Elementi DOM
+    const projectsGrid = document.getElementById('projectsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const filterContainer = document.getElementById('filterContainer');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const workModal = document.getElementById('workModal');
+    const addWorkForm = document.getElementById('addWorkForm');
+
+    // Salva nel LocalStorage
+    function saveProjects() {
+      localStorage.setItem('alex_projects', JSON.stringify(projects));
+    }
+
+    // Renderizza i Lavori
+    function renderProjects() {
+      projectsGrid.innerHTML = '';
+
+      // Filtra per ricerca e categoria
+      const filtered = projects.filter(project => {
+        const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
+        const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              project.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        projectsGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-folder-open"></i>
+            <h3>Nessun lavoro trovato</h3>
+            <p>Riprova con un'altra ricerca o aggiungi un nuovo lavoro dal pulsante in alto.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(project => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <span class="category-badge">${escapeHtml(project.category)}</span>
+              <button class="btn-delete" title="Elimina Lavoro" onclick="deleteProject('${project.id}')">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+            <h3 class="project-title">${escapeHtml(project.title)}</h3>
+            <p class="project-description">${escapeHtml(project.description)}</p>
+          </div>
+          <div class="card-footer">
+            <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" class="project-link">
+              Visita Progetto <i class="fa-solid fa-arrow-right-long"></i>
+            </a>
+          </div>
+        `;
+        projectsGrid.appendChild(card);
+      });
+    }
+
+    // Aggiungi Nuovo Progetto
+    function handleAddProject(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('workTitle').value.trim();
+      const category = document.getElementById('workCategory').value;
+      const url = document.getElementById('workUrl').value.trim();
+      const description = document.getElementById('workDesc').value.trim();
+
+      if (!title || !category || !url || !description) return;
+
+      const newProject = {
+        id: Date.now().toString(),
+        title,
+        category,
+        url,
+        description
+      };
+
+      projects.unshift(newProject);
+      saveProjects();
+      renderProjects();
+
+      // Reset form e chiusura
+      addWorkForm.reset();
+      toggleModal(false);
+    }
+
+    // Elimina Progetto
+    window.deleteProject = function(id) {
+      if (confirm('Sei sicuro di voler eliminare questo lavoro?')) {
+        projects = projects.filter(p => p.id !== id);
+        saveProjects();
+        renderProjects();
+      }
+    };
+
+    // Apri/Chiudi Modale
+    function toggleModal(show) {
+      if (show) {
+        workModal.classList.add('active');
+      } else {
+        workModal.classList.remove('active');
+      }
+    }
+
+    // Utility di sicurezza sanitizzazione HTML
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderProjects();
+    });
+
+    filterContainer.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-btn')) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        activeFilter = e.target.getAttribute('data-filter');
+        renderProjects();
+      }
+    });
+
+    openModalBtn.addEventListener('click', () => toggleModal(true));
+    closeModalBtn.addEventListener('click', () => toggleModal(false));
+    cancelBtn.addEventListener('click', () => toggleModal(false));
+    
+    // Chiudi modale se si clicca fuori dalla scheda
+    workModal.addEventListener('click', (e) => {
+      if (e.target === workModal) toggleModal(false);
+    });
+
+    addWorkForm.addEventListener('submit', handleAddProject);
+
+    // Inizializzazione al caricamento
+    renderProjects();
+  </script>
 </body>
 </html>
