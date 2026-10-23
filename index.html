@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ciao, sono Alex</title>
+  <title>Alex.</title>
 
   <style>
     * {
@@ -14,140 +14,133 @@
     }
 
     :root {
-      --bg: #ffffff;
-      --text: #111111;
-      --secondary: #666666;
-      --border: #e5e5e5;
-      --button-bg: #111111;
-      --button-text: #ffffff;
+      --bg: #fff;
+      --fg: #000;
+      --line: #e5e5e5;
     }
 
     body.dark {
-      --bg: #000000;
-      --text: #ffffff;
-      --secondary: #aaaaaa;
-      --border: #292929;
-      --button-bg: #ffffff;
-      --button-text: #000000;
+      --bg: #000;
+      --fg: #fff;
+      --line: #292929;
     }
 
     body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      transition: background .3s, color .3s;
+    }
+
+    .page {
       min-height: 100vh;
       min-height: 100dvh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      transition: background 0.3s, color 0.3s;
+      max-width: 1600px;
+      margin: auto;
+      padding: 32px 6%;
+      display: flex;
+      flex-direction: column;
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 28px 8%;
-      border-bottom: 1px solid var(--border);
     }
 
     .logo {
-      font-size: 20px;
+      font-size: 17px;
       font-weight: 800;
       letter-spacing: -1px;
     }
 
-    .theme-button {
-      padding: 10px 16px;
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      font-size: 13px;
+    button {
+      color: var(--fg);
+      background: none;
+      border: 1px solid var(--line);
+      padding: 10px 15px;
+      font-size: 12px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: .2s;
     }
 
-    .theme-button:hover {
-      background: var(--text);
+    button:hover {
+      background: var(--fg);
       color: var(--bg);
     }
 
     main {
-      min-height: calc(100vh - 145px);
-      min-height: calc(100dvh - 145px);
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: flex-start;
-      padding: 80px 12%;
+      padding: 100px 0;
     }
 
-    .subtitle {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 4px;
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--secondary);
       margin-bottom: 28px;
     }
 
     h1 {
-      font-size: clamp(52px, 10vw, 120px);
-      line-height: 0.95;
-      letter-spacing: -0.08em;
+      font-size: clamp(68px, 13.5vw, 190px);
       font-weight: 800;
+      letter-spacing: -0.095em;
+      line-height: .82;
     }
 
     h1 span {
       display: block;
-      margin-top: 12px;
-      -webkit-text-stroke: 1.5px var(--text);
-      color: transparent;
+      margin-top: 15px;
     }
 
-    .description {
-      max-width: 390px;
-      margin-top: 30px;
-      color: var(--secondary);
-      font-size: 16px;
-      line-height: 1.8;
+    .bottom {
+      margin-top: 48px;
+      width: 100%;
+      max-width: 430px;
     }
 
     .line {
-      width: 55px;
-      height: 2px;
-      background: var(--text);
-      margin-top: 35px;
+      height: 1px;
+      width: 100%;
+      background: var(--line);
+      margin-bottom: 20px;
+    }
+
+    .description {
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 290px;
     }
 
     footer {
       display: flex;
       justify-content: space-between;
-      padding: 22px 8%;
-      border-top: 1px solid var(--border);
-      color: var(--secondary);
-      font-size: 12px;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      font-size: 10px;
+      letter-spacing: 1px;
     }
 
     @media (max-width: 600px) {
-      header {
-        padding: 22px 6%;
-      }
-
-      main {
-        padding: 70px 8%;
+      .page {
+        padding: 24px 7%;
       }
 
       h1 {
-        font-size: clamp(52px, 13vw, 78px);
+        font-size: clamp(64px, 15vw, 100px);
       }
 
-      .description {
-        font-size: 14px;
+      main {
+        padding: 70px 0;
       }
 
-      footer {
-        padding: 20px 6%;
-        gap: 12px;
-        flex-wrap: wrap;
+      .bottom {
+        margin-top: 35px;
       }
     }
 
@@ -160,44 +153,44 @@
 </head>
 
 <body>
-  <header>
-    <div class="logo">ALEX.</div>
-    <button class="theme-button" id="themeToggle">
-      Tema scuro
-    </button>
-  </header>
+  <div class="page">
+    <header>
+      <div class="logo">A.</div>
+      <button id="theme">DARK MODE</button>
+    </header>
 
-  <main>
-    <p class="subtitle">Benvenuto nel mio spazio</p>
+    <main>
+      <p class="eyebrow">PERSONAL PAGE — 2026</p>
 
-    <h1>
-      Ciao, sono
-      <span>Alex.</span>
-    </h1>
+      <h1>
+        Ciao,
+        <span>sono Alex.</span>
+      </h1>
 
-    <p class="description">
-      Semplicità, creatività e attenzione ai dettagli.
-      Questo è il mio spazio, essenziale proprio come piace a me.
-    </p>
+      <div class="bottom">
+        <div class="line"></div>
+        <p class="description">
+          Uno spazio personale.<br>
+          Nient'altro.
+        </p>
+      </div>
+    </main>
 
-    <div class="line"></div>
-  </main>
-
-  <footer>
-    <span>© 2026 Alex</span>
-    <span>MINIMAL DESIGN</span>
-  </footer>
+    <footer>
+      <span>ALEX.</span>
+      <span>LESS, BUT BETTER.</span>
+    </footer>
+  </div>
 
   <script>
-    const button = document.getElementById("themeToggle");
+    const btn = document.getElementById("theme");
 
-    button.addEventListener("click", () => {
+    btn.addEventListener("click", () => {
       document.body.classList.toggle("dark");
 
-      button.textContent =
-        document.body.classList.contains("dark")
-          ? "Tema chiaro"
-          : "Tema scuro";
+      btn.textContent = document.body.classList.contains("dark")
+        ? "LIGHT MODE"
+        : "DARK MODE";
     });
   </script>
 </body>
