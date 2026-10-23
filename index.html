@@ -3,45 +3,333 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Ciao Alex 💖</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f5fa">
+  <title>Ciao, sono Alex</title>
+
   <style>
-    body {
+    :root {
+      color-scheme: light;
+      --bg: #f5f5fa;
+      --surface: rgba(255, 255, 255, 0.72);
+      --text: #171725;
+      --muted: #77778c;
+      --accent: #7762f6;
+      --border: rgba(120, 110, 160, 0.16);
+      --shadow: 0 24px 80px rgba(45, 35, 90, 0.10);
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #101018;
+      --surface: rgba(29, 29, 43, 0.78);
+      --text: #f4f2ff;
+      --muted: #a09db7;
+      --accent: #a394ff;
+      --border: rgba(190, 180, 255, 0.13);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
       margin: 0;
-      height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      transition: background 0.4s, color 0.4s;
+    }
+
+    .orb {
+      position: fixed;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.27;
+      pointer-events: none;
+      background: var(--accent);
+      animation: float 9s ease-in-out infinite alternate;
+    }
+
+    .orb.one {
+      top: -160px;
+      left: -120px;
+    }
+
+    .orb.two {
+      right: -150px;
+      bottom: -170px;
+      background: #ec83c6;
+      animation-delay: -4s;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      position: relative;
+      z-index: 1;
+    }
+
+    nav {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      background: linear-gradient(135deg, #ffd6e7, #d9c8ff);
-      font-family: 'Arial', sans-serif;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    .logo {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 16px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .theme-btn:hover {
+      transform: translateY(-2px);
     }
 
     .card {
-      background: white;
-      padding: 40px;
-      border-radius: 25px;
-      text-align: center;
-      box-shadow: 0 10px 30px #0002;
-      animation: float 3s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+      padding: clamp(32px, 8vw, 76px) clamp(24px, 7vw, 68px);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      animation: appear 0.8s ease both;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #36c98f;
+      box-shadow: 0 0 12px #36c98f80;
     }
 
     h1 {
-      color: #ff69a6;
-      font-size: 32px;
+      margin-top: 30px;
+      font-size: clamp(2.8rem, 9vw, 6.4rem);
+      font-weight: 850;
+      line-height: 1.02;
+      letter-spacing: -0.075em;
     }
 
-    p {
-      color: #888;
+    h1 span {
+      display: block;
+      color: var(--accent);
+      background: linear-gradient(110deg, var(--accent), #df83d0);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .description {
+      max-width: 440px;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      line-height: 1.8;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 0 23px;
+      border-radius: 14px;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .primary {
+      color: white;
+      background: linear-gradient(135deg, #7762f6, #9b73ed);
+      border: none;
+      box-shadow: 0 8px 25px #7762f635;
+    }
+
+    .secondary {
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 22px 5px 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    footer span:last-child {
+      letter-spacing: 1px;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes float {
-      50% { transform: translateY(-10px); }
+      from { transform: translate(0, 0); }
+      to { transform: translate(40px, 35px); }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 16px; }
+      .card { border-radius: 24px; }
+      nav { margin-bottom: 18px; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; }
+      footer { font-size: 0.72rem; }
+      .orb { width: 240px; height: 240px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>💖 Ciao sono Alex 💖</h1>
-    <p>Benvenuto nel mio piccolo mondo ✨</p>
-  </div>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <main class="container">
+    <nav>
+      <div class="logo">alex<span>.</span></div>
+
+      <button class="theme-btn" id="themeToggle"
+              aria-label="Cambia tema" aria-pressed="false">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">Tema scuro</span>
+      </button>
+    </nav>
+
+    <section class="card">
+      <div class="tag">
+        <span class="dot"></span>
+        ONLINE · BENVENUTO
+      </div>
+
+      <h1>
+        Ciao, sono
+        <span>Alex.</span>
+      </h1>
+
+      <p class="description">
+        Benvenuto nel mio piccolo spazio digitale.
+        Design moderno, idee creative e un tocco di personalità.
+        Felice di averti qui!
+      </p>
+
+      <div class="actions">
+        <a class="btn primary" href="#contatti"
+           onclick="document.getElementById('message').textContent =
+           'Grazie per essere passato! ✨'; return false;">
+          Scopri di più <span>↗</span>
+        </a>
+
+        <button class="btn secondary" id="helloBtn">
+          👋 Salutami
+        </button>
+      </div>
+
+      <p id="message" aria-live="polite"
+         style="margin-top: 20px; color: var(--accent);"></p>
+    </section>
+
+    <footer>
+      <span>© 2026 · Creato con passione</span>
+      <span>DESIGN · CREATIVITY · ALEX</span>
+    </footer>
+  </main>
+
+  <script>
+    const body = document.body;
+    const toggle = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    const message = document.getElementById('message');
+
+    toggle.addEventListener('click', () => {
+      const isDark = body.classList.toggle('dark');
+
+      icon.textContent = isDark ? '☀️' : '🌙';
+      label.textContent = isDark ? 'Tema chiaro' : 'Tema scuro';
+      toggle.setAttribute('aria-pressed', String(isDark));
+    });
+
+    document.getElementById('helloBtn').addEventListener('click', () => {
+      message.textContent = 'Ehi! 👋 Piacere di conoscerti!';
+    });
+  </script>
 </body>
 </html>
