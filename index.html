@@ -3,115 +3,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ciao sono Alex</title>
-  <!-- Importazione di un font elegante da Google Fonts -->
+  <title>Ciao, sono Alex</title>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
   
   <style>
-    /* Reset di base */
+    /* Reset generale e variabili */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      scroll-behavior: smooth;
     }
 
-    /* Definizione dei colori */
     :root {
-      --bg-color: #0b0b0b;          /* Nero profondo */
-      --card-bg: #141414;           /* Nero/Grigio molto scuro per contrasto */
-      --primary-red: #8b0016;       /* Rosso scuro elegante */
-      --accent-red: #a3122b;        /* Rosso leggermente più luminoso per sfumature/hover */
-      --text-white: #f5f5f5;        /* Bianco morbido */
-      --text-muted: #a0a0a0;        /* Grigio chiaro per dettagli */
+      --bg-dark: #070707;
+      --card-bg: #121212;
+      --red-deep: #8b0016;
+      --red-accent: #a3122b;
+      --red-glow: rgba(139, 0, 22, 0.35);
+      --text-main: #f0f0f0;
+      --text-muted: #8a8a8a;
+      --border-red: rgba(139, 0, 22, 0.3);
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-white);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Sfondi dinamici con bagliore rosso */
+    .bg-glow-1 {
+      position: fixed;
+      top: -100px;
+      left: -100px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--red-glow) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-glow-2 {
+      position: fixed;
+      bottom: -150px;
+      right: -150px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(163, 18, 43, 0.25) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(120px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Navbar elegante */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(7, 7, 7, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-red);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--red-accent);
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 2rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--text-main);
+    }
+
+    /* Hero Section (Schermo Intero) */
+    .hero {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Effetto sfocato di sfondo in rosso scuro */
-    .glow-background {
-      position: absolute;
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, var(--primary-red) 0%, rgba(0,0,0,0) 70%);
-      opacity: 0.25;
-      filter: blur(80px);
-      z-index: 1;
-      border-radius: 50%;
-    }
-
-    /* Card principale */
-    .card {
-      position: relative;
-      z-index: 2;
-      background-color: var(--card-bg);
-      padding: 3rem 4rem;
-      border-radius: 16px;
-      border: 1px solid rgba(139, 0, 22, 0.4); /* Bordo sottile rosso scuro */
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8),
-                  0 0 20px rgba(139, 0, 22, 0.15);
       text-align: center;
-      backdrop-filter: blur(10px);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9),
-                  0 0 25px rgba(163, 18, 43, 0.25);
-    }
-
-    /* Sottotitolo/Accetto sopra */
-    .subtitle {
-      font-size: 0.85rem;
+    .hero-subtitle {
+      font-size: 0.9rem;
       text-transform: uppercase;
-      letter-spacing: 4px;
-      color: var(--accent-red);
-      margin-bottom: 0.8rem;
+      letter-spacing: 6px;
+      color: var(--red-accent);
+      margin-bottom: 1.5rem;
       font-weight: 600;
     }
 
-    /* Titolo Principale */
-    h1 {
-      font-family: 'Cinzel', serif; /* Font elegante e classico */
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--text-white);
-      letter-spacing: 1px;
-      margin-bottom: 1.5rem;
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
 
-    /* Dettaglio stilistico (linea rossa elegante) */
-    .divider {
-      width: 50px;
+    .hero-description {
+      max-width: 600px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.5rem;
+      border: 1px solid var(--red-accent);
+      background: rgba(139, 0, 22, 0.15);
+      color: var(--text-main);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(139, 0, 22, 0.2);
+    }
+
+    .btn:hover {
+      background: var(--red-deep);
+      box-shadow: 0 0 25px rgba(163, 18, 43, 0.5);
+      transform: translateY(-2px);
+    }
+
+    /* Sezione Contenuti (Griglia) */
+    .section {
+      padding: 6rem 5%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
       height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+      background: var(--red-accent);
+      margin: 0.8rem auto 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
       margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-red);
+      padding: 2.5rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: var(--red-accent);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(139, 0, 22, 0.2);
+    }
+
+    .card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 300;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      border-top: 1px solid var(--border-red);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      position: relative;
+      z-index: 1;
+      background: #050505;
     }
   </style>
 </head>
 <body>
 
-  <!-- Bagliore soft di sfondo -->
-  <div class="glow-background"></div>
+  <!-- Bagliori di Sfondo -->
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
 
-  <!-- Contenitore centrale -->
-  <div class="card">
-    <p class="subtitle">Benvenuto</p>
-    <h1>Ciao, sono Alex</h1>
-    <div class="divider"></div>
-  </div>
+  <!-- Intestazione / Navbar -->
+  <header>
+    <a href="#" class="logo">Alex<span>.</span></a>
+    <nav>
+      <a href="#about">Chi Sono</a>
+      <a href="#progetti">Progetti</a>
+      <a href="#contatti">Contatti</a>
+    </nav>
+  </header>
 
-</body>
-</html>
+  <!-- Hero Section a Schermo Intero -->
+  <main>
+    <section class="hero">
+      <p class="hero-subtitle">Portfolio & Profilo Personale</p>
+      <h1 class="hero-title">Ciao, sono Alex</h1>
+      <p class="hero-description">
+        Benvenuto nel mio spazio digitale. Unisco passione, estetica e minimalismo per creare esperienze uniche e curate nei dettagli.
+      </p>
+      <a href="#about" class="btn">Scopri di più</a>
+    </section>
