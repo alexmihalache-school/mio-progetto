@@ -586,16 +586,16 @@
 
   <!-- Header solo Logo -->
   <header>
-    <a href="#" class="logo">Alex<span>.</span></a>
+    <a href="#" class="logo">Alexandru R. M.<span>.</span></a>
   </header>
 
   <!-- Hero Section -->
   <main>
     <section class="hero">
       <p class="hero-subtitle">Portfolio & Showcase Progetti</p>
-      <h1 class="hero-title">Ciao, sono Alex</h1>
+      <h1 class="hero-title">Alexandru Ricardo Mihalache</h1>
       <p class="hero-description">
-        Benvenuto nel mio spazio digitale. Esplora i miei lavori recenti, filtra le competenze o aggiungi nuovi progetti da mostrare al mondo.
+        Benvenuto nel mio spazio digitale. Esplora i miei lavori recenti, filtra lo stato dei progetti o aggiungi nuovi link futuri da mostrare.
       </p>
     </section>
 
@@ -618,10 +618,9 @@
         <!-- Filtri per Categoria -->
         <div class="filter-tags" id="filterContainer">
           <button class="filter-btn active" data-filter="all">Tutti</button>
-          <button class="filter-btn" data-filter="Web Design">Web Design</button>
-          <button class="filter-btn" data-filter="Sviluppo">Sviluppo</button>
-          <button class="filter-btn" data-filter="Branding">Branding</button>
-          <button class="filter-btn" data-filter="UI/UX">UI/UX</button>
+          <button class="filter-btn" data-filter="Default">Default</button>
+          <button class="filter-btn" data-filter="Incompleti">Incompleti</button>
+          <button class="filter-btn" data-filter="Completi">Completi</button>
         </div>
       </div>
 
@@ -646,13 +645,11 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="workCategory">Categoria *</label>
-
+          <label class="form-label" for="workCategory">Stato / Categoria *</label>
           <select id="workCategory" class="form-select" required>
-            <option value="Web Design" style="background: #121212;">Web Design</option>
-            <option value="Sviluppo" style="background: #121212;">Sviluppo</option>
-            <option value="Branding" style="background: #121212;">Branding</option>
-            <option value="UI/UX" style="background: #121212;">UI/UX</option>
+            <option value="Default" style="background: #121212;">Default</option>
+            <option value="Incompleti" style="background: #121212;">Incompleti</option>
+            <option value="Completi" style="background: #121212;">Completi</option>
           </select>
         </div>
 
@@ -676,7 +673,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2026 Alex. Tutti i diritti riservati.</p>
+    <p>&copy; 2026 Alexandru Ricardo Mihalache. Tutti i diritti riservati.</p>
   </footer>
 
   <!-- Script JS Interattivo -->
@@ -686,28 +683,28 @@
       {
         id: '1',
         title: 'Design Minimalista Scuro',
-        category: 'Web Design',
+        category: 'Completi',
         url: 'https://github.com',
         description: 'Interfaccia utente moderna realizzata per un brand d’alta moda con animazioni fluide e contrasti eleganti in rosso rubino.'
       },
       {
         id: '2',
         title: 'Piattaforma Web App',
-        category: 'Sviluppo',
+        category: 'Incompleti',
         url: 'https://google.com',
-        description: 'Applicazione web ad alte prestazioni focalizzata sulla reattività e sulla gestione ottimizzata dei dati locali.'
+        description: 'Applicazione web in fase di sviluppo focalizzata sulla reattività e sulla gestione ottimizzata dei dati locali.'
       },
       {
         id: '3',
         title: 'Identità Visiva Red Luxury',
-        category: 'Branding',
+        category: 'Default',
         url: 'https://behance.net',
-        description: 'Studio completo del brand, palette colori, tipografia custom e linee guida per prodotti digitali esclusivi.'
+        description: 'Studio di base del brand, palette colori, tipografia custom e linee guida per prodotti digitali esclusivi.'
       }
     ];
 
     // Stato dell'applicazione
-    let projects = JSON.parse(localStorage.getItem('alex_projects')) || defaultProjects;
+    let projects = JSON.parse(localStorage.getItem('alex_projects_v2')) || defaultProjects;
     let activeFilter = 'all';
     let searchQuery = '';
 
