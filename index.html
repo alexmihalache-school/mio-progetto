@@ -815,10 +815,37 @@
       if (isGitHubConfigured()) {
         await loadProjectsFromGitHub();
       } else {
+        try {
+          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+          if (rawRepo) {
+            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}`;
+            const res = await fetch(publicUrl);
+            if (res.ok) {
+              projects = await res.json();
+              syncStatus.textContent = "Stato: Modalità Locale (Progetti caricati da GitHub)";
+              renderProjects();
+              return;
+            }
+          }
+        } catch (e) {}
+
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.textContent = "Stato: Modalità Locale";
         renderProjects();
       }
+    }
+
+    function promptRepoFallback() {
+      try {
+        const hostnameParts = window.location.hostname.split('.');
+        if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
+          const username = hostnameParts[0];
+          const pathSegments = window.location.pathname.split('/').filter(Boolean);
+          const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
+          return `${username}/${repoName}`;
+        }
+      } catch (err) {}
+      return '';
     }
 
     async function loadProjectsFromGitHub() {
