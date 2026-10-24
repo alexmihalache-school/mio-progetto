@@ -816,7 +816,7 @@
         await loadProjectsFromGitHub();
       } else {
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.textContent = "Stato: Modalità Locale (Configura GitHub in alto)";
+        syncStatus.textContent = "Stato: Modalità Locale";
         renderProjects();
       }
     }
