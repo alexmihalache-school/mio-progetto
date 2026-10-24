@@ -904,7 +904,7 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
+          syncStatus.textContent = "Admin";
         } else {
           projects = [];
           syncStatus.textContent = "Stato: File projects.json non trovato";
