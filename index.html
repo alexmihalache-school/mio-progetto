@@ -556,6 +556,7 @@
     .modal-footer {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
       gap: 0.8rem;
       margin-top: 2rem;
       flex-wrap: wrap;
@@ -623,6 +624,14 @@
       header {
         flex-direction: column;
         align-items: flex-start;
+      }
+      .modal-footer {
+        flex-direction: column;
+        width: 100%;
+      }
+      .modal-footer button {
+        width: 100%;
+        justify-content: center;
       }
     }
   </style>
