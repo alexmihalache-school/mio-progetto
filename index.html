@@ -555,7 +555,7 @@
 
     .modal-footer {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
       align-items: center;
       gap: 0.8rem;
       margin-top: 2rem;
@@ -563,7 +563,7 @@
     }
 
     .btn-secondary {
-      padding: 0.8rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
@@ -571,6 +571,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
+      white-space: nowrap;
     }
 
     .btn-secondary:hover {
@@ -579,7 +580,7 @@
     }
 
     .btn-logout {
-      padding: 0.8rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       background: rgba(139, 0, 22, 0.2);
       border: 1px solid var(--red-accent);
       color: #ff6b6b;
@@ -591,6 +592,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      white-space: nowrap;
     }
 
     .btn-logout:hover {
