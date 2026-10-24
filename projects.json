@@ -1,8 +1,15 @@
 [
   {
+    "id": "1792845659631",
+    "title": "Gemini",
+    "category": "Default",
+    "url": "https://gemini.google.com/",
+    "description": "AI (test)"
+  },
+  {
     "id": "1792845333440",
     "title": "ChatGPT",
-    "category": "Attesa valutazione",
+    "category": "Default",
     "url": "https://chatgpt.com",
     "description": "AI (test)"
   },
