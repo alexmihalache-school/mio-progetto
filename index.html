@@ -556,8 +556,9 @@
     .modal-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 1rem;
+      gap: 0.8rem;
       margin-top: 2rem;
+      flex-wrap: wrap;
     }
 
     .btn-secondary {
@@ -574,6 +575,26 @@
     .btn-secondary:hover {
       color: var(--text-main);
       border-color: var(--text-muted);
+    }
+
+    .btn-logout {
+      padding: 0.8rem 1.5rem;
+      background: rgba(139, 0, 22, 0.2);
+      border: 1px solid var(--red-accent);
+      color: #ff6b6b;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-logout:hover {
+      background: var(--red-deep);
+      color: #ffffff;
     }
 
     footer {
@@ -717,6 +738,9 @@
         </div>
 
         <div class="modal-footer">
+          <button type="button" class="btn-logout" id="logoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> Esci
+          </button>
           <button type="button" class="btn-secondary" id="cancelConfigBtn">Annulla</button>
           <button type="submit" class="btn-primary">Salva Configurazione</button>
         </div>
@@ -768,6 +792,7 @@
     const configModal = document.getElementById('configModal');
     const closeConfigModalBtn = document.getElementById('closeConfigModalBtn');
     const cancelConfigBtn = document.getElementById('cancelConfigBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const configForm = document.getElementById('configForm');
     const ghTokenInput = document.getElementById('ghToken');
     const ghRepoInput = document.getElementById('ghRepo');
@@ -784,6 +809,7 @@
     configBtn.addEventListener('click', () => {
       ghTokenInput.value = ghConfig.token || '';
       ghRepoInput.value = ghConfig.repo || '';
+      logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
       configModal.classList.add('active');
     });
 
@@ -797,6 +823,15 @@
       if (e.target === configModal) closeConfigModal();
     });
 
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('gh_sync_config');
+      ghConfig = { token: '', repo: '', path: 'projects.json' };
+      ghTokenInput.value = '';
+      ghRepoInput.value = '';
+      closeConfigModal();
+      init();
+    });
+
     configForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const token = ghTokenInput.value.trim();
@@ -807,7 +842,6 @@
       ghConfig = { token, repo, path: 'projects.json' };
       localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
       closeConfigModal();
-      alert("Configurazione salvata con successo!");
       loadProjectsFromGitHub();
     });
 
