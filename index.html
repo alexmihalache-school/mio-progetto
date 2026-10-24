@@ -325,6 +325,9 @@
       transition: all 0.35s ease;
       position: relative;
       overflow: hidden;
+    }
+
+    .project-card.interactive {
       cursor: pointer;
     }
 
@@ -623,7 +626,7 @@
       <p class="hero-subtitle">Portfolio & Showcase Progetti</p>
       <h1 class="hero-title">Alexandru Ricardo Mihalache</h1>
       <p class="hero-description">
-        Benvenuto nel luogo dove raccolgo e condivido il mio lavoro. Dai un'occhiata ai progetti per vedere cosa realizzo.
+        Benvenuto nel luogo dove raccolgo e condivo il mio lavoro. Dai un'occhiata ai progetti per vedere cosa realizzo.
       </p>
     </section>
 
@@ -654,7 +657,6 @@
     </section>
   </main>
 
-  <!-- Modale Aggiungi/Modifica Lavoro -->
   <div class="modal-overlay" id="workModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -697,7 +699,6 @@
     </div>
   </div>
 
-  <!-- Modale Configurazione GitHub -->
   <div class="modal-overlay" id="configModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -723,7 +724,6 @@
     </div>
   </div>
 
-  <!-- Modale Conferma Eliminazione -->
   <div class="modal-overlay" id="deleteModal">
     <div class="modal-card" style="max-width: 420px; text-align: center;">
       <div class="modal-header" style="justify-content: center; margin-bottom: 1rem;">
@@ -764,7 +764,6 @@
     const saveBtnText = document.getElementById('saveBtnText');
     const editProjectId = document.getElementById('editProjectId');
     
-    // Elementi modale configurazione GitHub
     const configBtn = document.getElementById('configBtn');
     const configModal = document.getElementById('configModal');
     const closeConfigModalBtn = document.getElementById('closeConfigModalBtn');
@@ -774,12 +773,14 @@
     const ghRepoInput = document.getElementById('ghRepo');
     const syncStatus = document.getElementById('syncStatus');
 
-    // Elementi modale eliminazione
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    // Gestione apertura/chiusura modale configurazione
+    function isGitHubConfigured() {
+      return Boolean(ghConfig.token && ghConfig.repo);
+    }
+
     configBtn.addEventListener('click', () => {
       ghTokenInput.value = ghConfig.token || '';
       ghRepoInput.value = ghConfig.repo || '';
@@ -796,7 +797,6 @@
       if (e.target === configModal) closeConfigModal();
     });
 
-    // Salvataggio configurazione GitHub dal form
     configForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const token = ghTokenInput.value.trim();
@@ -812,7 +812,7 @@
     });
 
     async function init() {
-      if (ghConfig.token && ghConfig.repo) {
+      if (isGitHubConfigured()) {
         await loadProjectsFromGitHub();
       } else {
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
@@ -847,7 +847,7 @@
     async function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
       
-      if (!ghConfig.token || !ghConfig.repo) {
+      if (!isGitHubConfigured()) {
         renderProjects();
         return;
       }
@@ -892,7 +892,6 @@
       renderProjects();
     }
 
-    // Aggiorna il numero di progetti tra parentesi sui tasti filtro
     function updateFilterCounts() {
       const total = projects.length;
       const countDefault = projects.filter(p => p.category === 'Default').length;
@@ -918,6 +917,14 @@
     }
 
     function renderProjects() {
+      const isSynced = isGitHubConfigured();
+
+      if (isSynced) {
+        openModalBtn.style.display = 'inline-flex';
+      } else {
+        openModalBtn.style.display = 'none';
+      }
+
       updateFilterCounts();
       projectsGrid.innerHTML = '';
 
@@ -934,7 +941,7 @@
           <div class="empty-state">
             <i class="fa-solid fa-folder-open"></i>
             <h3>Nessun lavoro trovato</h3>
-            <p>Aggiungi un nuovo lavoro cliccando sul pulsante in alto.</p>
+            <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun progetto disponibile.'}</p>
           </div>
         `;
         return;
@@ -942,20 +949,27 @@
 
       filtered.forEach(project => {
         const card = document.createElement('div');
-        card.className = 'project-card';
-        card.addEventListener('click', (e) => {
-          if (!e.target.closest('button') && !e.target.closest('a')) {
-            openEditModal(project.id);
-          }
-        });
+        card.className = 'project-card' + (isSynced ? ' interactive' : '');
+        
+        if (isSynced) {
+          card.addEventListener('click', (e) => {
+            if (!e.target.closest('button') && !e.target.closest('a')) {
+              openEditModal(project.id);
+            }
+          });
+        }
+
+        const deleteBtnHtml = isSynced 
+          ? `<button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
+               <i class="fa-solid fa-trash-can"></i>
+             </button>` 
+          : '';
 
         card.innerHTML = `
           <div>
             <div class="card-top">
               <span class="category-badge">${escapeHtml(project.category)}</span>
-              <button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
+              ${deleteBtnHtml}
             </div>
             <h3 class="project-title">${escapeHtml(project.title)}</h3>
             <p class="project-description">${escapeHtml(project.description)}</p>
@@ -1004,6 +1018,7 @@
     }
 
     function openCreateModal() {
+      if (!isGitHubConfigured()) return;
       addWorkForm.reset();
       editProjectId.value = '';
       modalTitleText.textContent = 'Aggiungi Nuovo Lavoro';
@@ -1012,6 +1027,7 @@
     }
 
     function openEditModal(id) {
+      if (!isGitHubConfigured()) return;
       const project = projects.find(p => p.id === id);
       if (!project) return;
 
@@ -1026,8 +1042,8 @@
       toggleModal(true);
     }
 
-    // Gestione eliminazione con Modale Custom
     window.promptDeleteProject = function(id, event) {
+      if (!isGitHubConfigured()) return;
       event.stopPropagation();
       projectToDeleteId = id;
       deleteModal.classList.add('active');
