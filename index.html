@@ -614,7 +614,7 @@
   <header>
     <a href="#" class="logo">ITT Cannizzaro Rho<span>.</span></a>
     <div class="header-actions">
-      <span class="sync-status" id="syncStatus">Stato: Locale</span>
+      <span class="sync-status" id="syncStatus">Stato: Modalità Locale</span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
         <i class="fa-solid fa-gear"></i> Configura GitHub
       </button>
@@ -626,7 +626,7 @@
       <p class="hero-subtitle">Portfolio & Showcase Progetti</p>
       <h1 class="hero-title">Alexandru Ricardo Mihalache</h1>
       <p class="hero-description">
-        Benvenuto nel luogo dove raccolgo e condivo il mio lavoro. Dai un'occhiata ai progetti per vedere cosa realizzo.
+        Benvenuto nel luogo dove raccolgo e condivido il mio lavoro. Dai un'occhiata ai progetti per vedere cosa realizzo.
       </p>
     </section>
 
@@ -835,7 +835,7 @@
           syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
         } else {
           projects = [];
-          syncStatus.textContent = "Stato: File projects.json non trovato (verrà creato al primo salvataggio)";
+          syncStatus.textContent = "Stato: File projects.json non trovato";
         }
       } catch (err) {
         syncStatus.textContent = "Stato: Errore connessione GitHub ❌";
@@ -941,7 +941,7 @@
           <div class="empty-state">
             <i class="fa-solid fa-folder-open"></i>
             <h3>Nessun lavoro trovato</h3>
-            <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun progetto disponibile.'}</p>
+            <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun lavoro disponibile al momento.'}</p>
           </div>
         `;
         return;
