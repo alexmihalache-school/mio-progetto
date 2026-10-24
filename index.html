@@ -867,7 +867,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
-              syncStatus.textContent = "Stato: Modalità Locale (Progetti caricati da GitHub)";
+              syncStatus.textContent = "Stato: Modalità Locale";
               renderProjects();
               return;
             }
