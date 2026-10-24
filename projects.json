@@ -2,7 +2,7 @@
   {
     "id": "1792779880034",
     "title": "Anagrafica 1.0",
-    "category": "Incompleto",
+    "category": "Completo",
     "url": "https://alexmihalache-school.github.io/mio-progetto/Anagrafica.html",
     "description": "Progetto scolastico basato sulla creazione di un'interfaccia interattiva per la raccolta di dati anagrafici tramite campi di testo e numerici. Attraverso la pressione di un pulsante, una funzione JavaScript sfrutta la manipolazione del DOM per inserire dinamicamente i dati all'interno di una tabella HTML in tempo reale."
   }
