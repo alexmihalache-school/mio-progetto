@@ -867,7 +867,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
-              syncStatus.textContent = "Stato: Modalità Locale";
+              syncStatus.textContent = "Utente";
               renderProjects();
               return;
             }
@@ -875,7 +875,7 @@
         } catch (e) {}
 
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.textContent = "Stato: Modalità Locale";
+        syncStatus.textContent = "Utente";
         renderProjects();
       }
     }
@@ -894,7 +894,7 @@
     }
 
     async function loadProjectsFromGitHub() {
-      syncStatus.textContent = "Stato: Caricamento da GitHub...";
+      syncStatus.textContent = "Caricamento da GitHub...";
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         const res = await fetch(url, {
@@ -954,7 +954,7 @@
         });
 
         if (putRes.ok) {
-          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
+          syncStatus.textContent = "Admin";
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
         }
