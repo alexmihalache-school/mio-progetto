@@ -818,7 +818,7 @@
         try {
           const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
           if (rawRepo) {
-            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}`;
+            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
