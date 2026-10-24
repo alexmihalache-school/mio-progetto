@@ -88,7 +88,7 @@
       font-family: 'Cinzel', serif;
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: #ffffff; /* Modificato in bianco */
       letter-spacing: 2px;
       text-decoration: none;
       transition: text-shadow 0.3s ease;
@@ -131,6 +131,11 @@
     .sync-status {
       font-size: 0.75rem;
       color: var(--text-muted);
+    }
+
+    .sync-status.status-admin {
+      color: var(--red-accent); /* Modificato in rosso */
+      font-weight: 600;
     }
 
     .hero {
@@ -869,6 +874,7 @@
             if (res.ok) {
               projects = await res.json();
               syncStatus.textContent = "Utente";
+              syncStatus.className = "sync-status";
               renderProjects();
               return;
             }
@@ -877,6 +883,7 @@
 
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.textContent = "Utente";
+        syncStatus.className = "sync-status";
         renderProjects();
       }
     }
@@ -896,6 +903,7 @@
 
     async function loadProjectsFromGitHub() {
       syncStatus.textContent = "Caricamento da GitHub...";
+      syncStatus.className = "sync-status";
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         const res = await fetch(url, {
@@ -906,12 +914,15 @@
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
           syncStatus.textContent = "Admin";
+          syncStatus.className = "sync-status status-admin"; /* Applicato colore rosso */
         } else {
           projects = [];
           syncStatus.textContent = "Stato: File projects.json non trovato";
+          syncStatus.className = "sync-status";
         }
       } catch (err) {
         syncStatus.textContent = "Stato: Errore connessione GitHub ❌";
+        syncStatus.className = "sync-status";
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
       }
       renderProjects();
@@ -926,6 +937,7 @@
       }
 
       syncStatus.textContent = "Stato: Salvataggio su GitHub in corso...";
+      syncStatus.className = "sync-status";
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         
@@ -956,11 +968,14 @@
 
         if (putRes.ok) {
           syncStatus.textContent = "Admin";
+          syncStatus.className = "sync-status status-admin"; /* Applicato colore rosso */
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
+          syncStatus.className = "sync-status";
         }
       } catch (err) {
         syncStatus.textContent = "Stato: Errore di rete durante il salvataggio ❌";
+        syncStatus.className = "sync-status";
       }
       renderProjects();
     }
@@ -1007,6 +1022,30 @@
                             project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             project.category.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
+      });
+
+      // Ordinamento dei lavori
+      const categoryOrder = {
+        'Attesa valutazione': 1,
+        'Incompleto': 2,
+        'Default': 3,
+        'Completo': 4
+      };
+
+      filtered.sort((a, b) => {
+        if (activeFilter === 'all') {
+          // Ordinamento principale per categorie secondo l'ordine richiesto
+          const orderA = categoryOrder[a.category] || 99;
+          const orderB = categoryOrder[b.category] || 99;
+          if (orderA !== orderB) {
+            return orderA - orderB;
+          }
+          // Sottordine alfabetico per le categorie uguali in "Tutti"
+          return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
+        } else {
+          // Ordinamento alfabetico per titolo all'interno di una categoria specifica
+          return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
+        }
       });
 
       if (filtered.length === 0) {
@@ -1133,7 +1172,7 @@
     });
 
     confirmDeleteBtn.addEventListener('click', () => {
-      if (projectToDeleteId) {
+      caseId: if (projectToDeleteId) {
         projects = projects.filter(p => p.id !== projectToDeleteId);
         closeDeleteModal();
         saveToGitHub();
