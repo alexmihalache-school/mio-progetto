@@ -153,9 +153,8 @@
     }
 
     .sync-status {
-      font-size: 0.85rem;
-      color: #a3122b;
-      font-weight: 600;
+      font-size: 0.75rem;
+      color: var(--text-muted);
     }
 
     .sync-status.status-admin {
@@ -700,7 +699,7 @@
   <header>
     <a href="#" class="logo">ITT Cannizzaro Rho<span>.</span></a>
     <div class="header-actions">
-      <span class="sync-status" id="syncStatus">Accesso: Utente</span>
+      <span class="sync-status" id="syncStatus">Utente</span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
         <i class="fa-solid fa-gear"></i> Configura GitHub
       </button>
@@ -723,7 +722,7 @@
         <div class="controls-bar">
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione..." autocomplete="off">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione...">
           </div>
           <button class="btn-primary" id="openModalBtn">
             <i class="fa-solid fa-plus"></i> Nuovo Lavoro
@@ -747,19 +746,19 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
-        <button class="btn-close" id="closeModalBtn">×</button>
+        <button class="btn-close" id="closeModalBtn">&times;</button>
       </div>
       <form id="addWorkForm">
         <input type="hidden" id="editProjectId">
         
         <div class="form-group">
           <label class="form-label" for="workTitle">Titolo del Progetto *</label>
-          <input type="text" id="workTitle" class="form-input" placeholder="Esempio" required autocomplete="off">
+          <input type="text" id="workTitle" class="form-input" placeholder="Esempio" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="workCategory">Stato / Categoria *</label>
-          <select id="workCategory" class="form-select" required autocomplete="off">
+          <select id="workCategory" class="form-select" required>
             <option value="Default" style="background: #121212;">Default</option>
             <option value="Incompleto" style="background: #121212;">Incompleto</option>
             <option value="Completo" style="background: #121212;">Completo</option>
@@ -769,12 +768,12 @@
 
         <div class="form-group">
           <label class="form-label" for="workUrl">URL del Progetto *</label>
-          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com" required autocomplete="off">
+          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="workDesc">Descrizione Breve *</label>
-          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto..." required autocomplete="off"></textarea>
+          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto..." required></textarea>
         </div>
 
         <div class="modal-footer">
@@ -789,17 +788,17 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title">Configura GitHub Sync</h3>
-        <button class="btn-close" id="closeConfigModalBtn">×</button>
+        <button class="btn-close" id="closeConfigModalBtn">&times;</button>
       </div>
       <form id="configForm">
         <div class="form-group">
           <label class="form-label" for="ghToken">GitHub Personal Access Token (PAT) *</label>
-          <input type="password" id="ghToken" class="form-input" placeholder="token (ghp_...)" required autocomplete="off" data-lpignore="true" data-form-type="other">
+          <input type="password" id="ghToken" class="form-input" placeholder="token (ghp_...)" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="ghRepo">Repository (Username / Nome Repo) *</label>
-          <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required autocomplete="off" data-lpignore="true">
+          <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required>
         </div>
 
         <div class="modal-footer">
@@ -922,7 +921,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
-              syncStatus.textContent = "Accesso: Utente";
+              syncStatus.textContent = "Utente";
               syncStatus.className = "sync-status";
               renderProjects();
               return;
@@ -931,7 +930,7 @@
         } catch (e) {}
 
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.textContent = "Accesso: Utente";
+        syncStatus.textContent = "Utente";
         syncStatus.className = "sync-status";
         renderProjects();
       }
@@ -962,7 +961,7 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          syncStatus.textContent = "Accesso: Admin";
+          syncStatus.textContent = "Admin";
           syncStatus.className = "sync-status status-admin";
         } else {
           projects = [];
@@ -1016,7 +1015,7 @@
         });
 
         if (putRes.ok) {
-          syncStatus.textContent = "Accesso: Admin";
+          syncStatus.textContent = "Admin";
           syncStatus.className = "sync-status status-admin";
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
@@ -1245,11 +1244,11 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
-          '&': '&',
-          '<': '<',
-          '>': '>',
-          '"': '"',
-          "'": '''
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
         }[m];
       });
     }
