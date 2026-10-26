@@ -18,6 +18,30 @@
       scroll-behavior: smooth;
     }
 
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #070707;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333333;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--red-accent);
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #333333 #070707;
+    }
+
     :root {
       --bg-dark: #070707;
       --card-bg: #121212;
@@ -405,6 +429,30 @@
       font-weight: 300;
       margin-bottom: 2rem;
       flex-grow: 1;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 0.4rem;
+
+      scrollbar-width: thin;
+      scrollbar-color: rgba(163, 18, 43, 0.5) rgba(255, 255, 255, 0.03);
+    }
+
+    .project-description::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .project-description::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 3px;
+    }
+
+    .project-description::-webkit-scrollbar-thumb {
+      background: rgba(163, 18, 43, 0.5);
+      border-radius: 3px;
+    }
+
+    .project-description::-webkit-scrollbar-thumb:hover {
+      background: var(--red-accent);
     }
 
     .card-footer {
@@ -914,7 +962,7 @@
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
           syncStatus.textContent = "Admin";
-          syncStatus.className = "sync-status status-admin"; /* Applicato colore rosso */
+          syncStatus.className = "sync-status status-admin";
         } else {
           projects = [];
           syncStatus.textContent = "Stato: File projects.json non trovato";
@@ -968,7 +1016,7 @@
 
         if (putRes.ok) {
           syncStatus.textContent = "Admin";
-          syncStatus.className = "sync-status status-admin"; /* Applicato colore rosso */
+          syncStatus.className = "sync-status status-admin";
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
           syncStatus.className = "sync-status";
@@ -1024,7 +1072,6 @@
         return matchesCategory && matchesSearch;
       });
 
-      // Ordinamento dei lavori
       const categoryOrder = {
         'Attesa valutazione': 1,
         'Incompleto': 2,
@@ -1034,16 +1081,13 @@
 
       filtered.sort((a, b) => {
         if (activeFilter === 'all') {
-          // Ordinamento principale per categorie secondo l'ordine richiesto
           const orderA = categoryOrder[a.category] || 99;
           const orderB = categoryOrder[b.category] || 99;
           if (orderA !== orderB) {
             return orderA - orderB;
           }
-          // Sottordine alfabetico per le categorie uguali in "Tutti"
           return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
         } else {
-          // Ordinamento alfabetico per titolo all'interno di una categoria specifica
           return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
         }
       });
@@ -1172,7 +1216,7 @@
     });
 
     confirmDeleteBtn.addEventListener('click', () => {
-      caseId: if (projectToDeleteId) {
+      if (projectToDeleteId) {
         projects = projects.filter(p => p.id !== projectToDeleteId);
         closeDeleteModal();
         saveToGitHub();
@@ -1189,8 +1233,12 @@
 
     function closeModal() {
       toggleModal(false);
-      addWorkForm.reset();
-      editProjectId.value = '';
+      setTimeout(() => {
+        if (!workModal.classList.contains('active')) {
+          addWorkForm.reset();
+          editProjectId.value = '';
+        }
+      }, 300);
     }
 
     function escapeHtml(str) {
