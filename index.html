@@ -701,7 +701,7 @@
     <div class="header-actions">
       <span class="sync-status" id="syncStatus">Utente</span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
-        <i class="fa-solid fa-gear"></i> Configura GitHub
+        <i class="fa-solid fa-gear"></i> Dashboard
       </button>
     </div>
   </header>
@@ -722,7 +722,7 @@
         <div class="controls-bar">
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione..." autocomplete="off">
           </div>
           <button class="btn-primary" id="openModalBtn">
             <i class="fa-solid fa-plus"></i> Nuovo Lavoro
@@ -748,12 +748,12 @@
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
         <button class="btn-close" id="closeModalBtn">&times;</button>
       </div>
-      <form id="addWorkForm">
+      <form id="addWorkForm" autocomplete="off">
         <input type="hidden" id="editProjectId">
         
         <div class="form-group">
           <label class="form-label" for="workTitle">Titolo del Progetto *</label>
-          <input type="text" id="workTitle" class="form-input" placeholder="Esempio" required>
+          <input type="text" id="workTitle" class="form-input" placeholder="Esempio" required autocomplete="off">
         </div>
 
         <div class="form-group">
@@ -768,12 +768,12 @@
 
         <div class="form-group">
           <label class="form-label" for="workUrl">URL del Progetto *</label>
-          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com" required>
+          <input type="url" id="workUrl" class="form-input" placeholder="https://esempio.com" required autocomplete="off">
         </div>
 
         <div class="form-group">
           <label class="form-label" for="workDesc">Descrizione Breve *</label>
-          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto..." required></textarea>
+          <textarea id="workDesc" class="form-textarea" placeholder="Descrivi il progetto..." required autocomplete="off"></textarea>
         </div>
 
         <div class="modal-footer">
@@ -790,15 +790,15 @@
         <h3 class="modal-title">Configura GitHub Sync</h3>
         <button class="btn-close" id="closeConfigModalBtn">&times;</button>
       </div>
-      <form id="configForm">
+      <form id="configForm" autocomplete="off">
         <div class="form-group">
           <label class="form-label" for="ghToken">GitHub Personal Access Token (PAT) *</label>
-          <input type="password" id="ghToken" class="form-input" placeholder="token (ghp_...)" required>
+          <input type="password" id="ghToken" class="form-input" placeholder="token (ghp_...)" required autocomplete="new-password">
         </div>
 
         <div class="form-group">
           <label class="form-label" for="ghRepo">Repository (Username / Nome Repo) *</label>
-          <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required>
+          <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required autocomplete="off">
         </div>
 
         <div class="modal-footer">
