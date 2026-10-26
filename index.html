@@ -703,7 +703,7 @@
   <header>
     <a href="#" class="logo">ITT Cannizzaro Rho<span>.</span></a>
     <div class="header-actions">
-      <span class="sync-status" id="syncStatus">Accesso: <span class="status-role">Utente</span></span>
+      <span class="sync-status" id="syncStatus">Stato: <span class="status-role">Utente</span></span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
         <i class="fa-solid fa-gear"></i> Dashboard
       </button>
@@ -925,7 +925,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
-              syncStatus.innerHTML = 'Accesso: <span class="status-role">Utente</span>';
+              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
               syncStatus.className = "sync-status";
               renderProjects();
               return;
@@ -934,7 +934,7 @@
         } catch (e) {}
 
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.innerHTML = 'Accesso: <span class="status-role">Utente</span>';
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
         renderProjects();
       }
@@ -965,7 +965,7 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          syncStatus.innerHTML = 'Accesso: <span class="status-role">Admin</span>';
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
         } else {
           projects = [];
@@ -1019,7 +1019,7 @@
         });
 
         if (putRes.ok) {
-          syncStatus.innerHTML = 'Accesso: <span class="status-role">Admin</span>';
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
