@@ -157,7 +157,11 @@
       color: var(--text-muted);
     }
 
-    .sync-status.status-admin {
+    .sync-status .status-role {
+      color: var(--text-main);
+    }
+
+    .sync-status.status-admin .status-role {
       color: var(--red-accent);
       font-weight: 600;
     }
@@ -699,7 +703,7 @@
   <header>
     <a href="#" class="logo">ITT Cannizzaro Rho<span>.</span></a>
     <div class="header-actions">
-      <span class="sync-status" id="syncStatus">Utente</span>
+      <span class="sync-status" id="syncStatus">Accesso: <span class="status-role">Utente</span></span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
         <i class="fa-solid fa-gear"></i> Dashboard
       </button>
@@ -921,7 +925,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
-              syncStatus.textContent = "Utente";
+              syncStatus.innerHTML = 'Accesso: <span class="status-role">Utente</span>';
               syncStatus.className = "sync-status";
               renderProjects();
               return;
@@ -930,7 +934,7 @@
         } catch (e) {}
 
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.textContent = "Utente";
+        syncStatus.innerHTML = 'Accesso: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
         renderProjects();
       }
@@ -961,7 +965,7 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          syncStatus.textContent = "Admin";
+          syncStatus.innerHTML = 'Accesso: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
         } else {
           projects = [];
@@ -1015,7 +1019,7 @@
         });
 
         if (putRes.ok) {
-          syncStatus.textContent = "Admin";
+          syncStatus.innerHTML = 'Accesso: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
         } else {
           syncStatus.textContent = "Stato: Errore durante il commit ❌";
