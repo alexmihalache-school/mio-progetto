@@ -759,7 +759,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
-        <button class="btn-close" id="closeModalBtn">×</button>
+        <button class="btn-close" id="closeModalBtn">&times;</button>
       </div>
       <form id="addWorkForm">
         <input type="hidden" id="editProjectId">
@@ -801,7 +801,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title">Configura GitHub Sync</h3>
-        <button class="btn-close" id="closeConfigModalBtn">×</button>
+        <button class="btn-close" id="closeConfigModalBtn">&times;</button>
       </div>
       <form id="configForm">
         <div class="form-group">
@@ -928,7 +928,7 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadFromGitHubFast(tempConfig);
+      const success = await testAndLoadFromGitHub(tempConfig);
 
       if (success) {
         ghConfig = tempConfig;
@@ -940,15 +940,7 @@
       }
     });
 
-    function decodeB64Utf8(str) {
-      try {
-        return decodeURIComponent(escape(atob(str)));
-      } catch (e) {
-        return atob(str);
-      }
-    }
-
-    async function testAndLoadFromGitHubFast(config) {
+    async function testAndLoadFromGitHub(config) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
@@ -956,8 +948,8 @@
         });
         if (res.ok) {
           const data = await res.json();
-          const decodedText = decodeB64Utf8(data.content.replace(/\n/g, ''));
-          projects = JSON.parse(decodedText);
+          const decoded = JSON.parse(atob(data.content));
+          projects = decoded;
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
@@ -974,33 +966,35 @@
       }
     }
 
-    function init() {
+    async function init() {
       if (isGitHubConfigured()) {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-        syncStatus.className = "sync-status status-admin";
-        renderProjects();
-        testAndLoadFromGitHubFast(ghConfig).then(() => {
-          renderProjects();
-        });
+        const success = await testAndLoadFromGitHub(ghConfig);
+        if (!success) {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+          syncStatus.className = "sync-status";
+          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+        }
       } else {
+        try {
+          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+          if (rawRepo) {
+            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
+            const res = await fetch(publicUrl);
+            if (res.ok) {
+              projects = await res.json();
+              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+              syncStatus.className = "sync-status";
+              renderProjects();
+              return;
+            }
+          }
+        } catch (e) {}
+
+        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
-        renderProjects();
-
-        setTimeout(async () => {
-          try {
-            const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-            if (rawRepo) {
-              const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-              const res = await fetch(publicUrl);
-              if (res.ok) {
-                projects = await res.json();
-                renderProjects();
-              }
-            }
-          } catch (e) {}
-        }, 0);
       }
+      renderProjects();
     }
 
     function promptRepoFallback() {
@@ -1017,6 +1011,8 @@
     }
 
     async function saveToGitHub() {
+      localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+      
       if (!isGitHubConfigured()) {
         renderProjects();
         return;
@@ -1274,11 +1270,11 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
-          '&': '&',
-          '<': '<',
-          '>': '>',
-          '"': '"',
-          "'": '''
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
         }[m];
       });
     }
