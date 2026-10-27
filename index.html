@@ -610,6 +610,15 @@
       box-shadow: 0 0 10px rgba(163, 18, 43, 0.3);
     }
 
+    .config-error-msg {
+      display: none;
+      color: var(--red-hover);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
     .modal-footer {
       display: flex;
       justify-content: flex-start;
@@ -655,15 +664,6 @@
     .btn-logout:hover {
       background: var(--red-deep);
       color: #ffffff;
-    }
-
-    .config-error-msg {
-      display: none;
-      color: #ff4d4d;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      text-align: center;
     }
 
     footer {
@@ -911,35 +911,40 @@
       ghConfig = { token: '', repo: '', path: 'projects.json' };
       ghTokenInput.value = '';
       ghRepoInput.value = '';
+      configErrorMsg.style.display = 'none';
       closeConfigModal();
       init();
     });
 
     configForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      configErrorMsg.style.display = 'none';
       const token = ghTokenInput.value.trim();
       const repo = ghRepoInput.value.trim();
 
-      if (!token || !repo) return;
+      if (!token || !repo) {
+        configErrorMsg.style.display = 'block';
+        return;
+      }
 
-      configErrorMsg.style.display = 'none';
       const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadGitHubConfig(tempConfig);
+      const success = await testAndLoadFromGitHub(tempConfig);
 
       if (success) {
         ghConfig = tempConfig;
         localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
         closeConfigModal();
+        renderProjects();
       } else {
         configErrorMsg.style.display = 'block';
       }
     });
 
-    async function testAndLoadGitHubConfig(cfg) {
+    async function testAndLoadFromGitHub(config) {
       try {
-        const url = `https://api.github.com/repos/${cfg.repo}/contents/${cfg.path}`;
+        const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
-          headers: { 'Authorization': `token ${cfg.token}` }
+          headers: { 'Authorization': `token ${config.token}` }
         });
         if (res.ok) {
           const data = await res.json();
@@ -947,16 +952,15 @@
           projects = decoded;
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
-          renderProjects();
           return true;
         } else if (res.status === 404) {
           projects = [];
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
-          renderProjects();
           return true;
+        } else {
+          return false;
         }
-        return false;
       } catch (err) {
         return false;
       }
@@ -964,7 +968,12 @@
 
     async function init() {
       if (isGitHubConfigured()) {
-        await loadProjectsFromGitHub();
+        const success = await testAndLoadFromGitHub(ghConfig);
+        if (!success) {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+          syncStatus.className = "sync-status";
+          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+        }
       } else {
         try {
           const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
@@ -984,8 +993,8 @@
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
-        renderProjects();
       }
+      renderProjects();
     }
 
     function promptRepoFallback() {
@@ -1001,33 +1010,6 @@
       return '';
     }
 
-    async function loadProjectsFromGitHub() {
-      syncStatus.textContent = "Caricamento da GitHub...";
-      syncStatus.className = "sync-status";
-      try {
-        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
-        const res = await fetch(url, {
-          headers: { 'Authorization': `token ${ghConfig.token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const decoded = JSON.parse(atob(data.content));
-          projects = decoded;
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
-        } else {
-          projects = [];
-          syncStatus.textContent = "Stato: File projects.json non trovato";
-          syncStatus.className = "sync-status";
-        }
-      } catch (err) {
-        syncStatus.textContent = "Stato: Errore connessione GitHub ❌";
-        syncStatus.className = "sync-status";
-        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-      }
-      renderProjects();
-    }
-
     async function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
       
@@ -1036,8 +1018,6 @@
         return;
       }
 
-      syncStatus.textContent = "Stato: Salvataggio su GitHub in corso...";
-      syncStatus.className = "sync-status";
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         
@@ -1069,14 +1049,8 @@
         if (putRes.ok) {
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
-        } else {
-          syncStatus.textContent = "Stato: Errore durante il commit ❌";
-          syncStatus.className = "sync-status";
         }
-      } catch (err) {
-        syncStatus.textContent = "Stato: Errore di rete durante il salvataggio ❌";
-        syncStatus.className = "sync-status";
-      }
+      } catch (err) {}
       renderProjects();
     }
 
