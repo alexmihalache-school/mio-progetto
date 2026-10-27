@@ -849,12 +849,17 @@
   </footer>
 
   <script>
-    let projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+    const STORAGE_KEY_PROJECTS = 'alex_projects_v4';
+    const STORAGE_KEY_CONFIG = 'gh_sync_config';
+    const STORAGE_KEY_CACHE = 'gh_sync_cache';
+    const STORAGE_KEY_ADMIN = 'gh_sync_admin_flag';
+
+    let ghConfig = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG)) || { token: '', repo: '', path: 'projects.json' };
+
+    let projects = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS)) || [];
     let activeFilter = 'all';
     let searchQuery = '';
     let projectToDeleteId = null;
-
-    let ghConfig = JSON.parse(localStorage.getItem('gh_sync_config')) || { token: '', repo: '', path: 'projects.json' };
 
     const projectsGrid = document.getElementById('projectsGrid');
     const searchInput = document.getElementById('searchInput');
@@ -883,10 +888,76 @@
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    renderProjects();
-
     function isGitHubConfigured() {
       return Boolean(ghConfig.token && ghConfig.repo);
+    }
+
+    function setAdminStatus(admin) {
+      if (admin) {
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+        syncStatus.className = "sync-status status-admin";
+      } else {
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+        syncStatus.className = "sync-status";
+      }
+      openModalBtn.style.display = admin ? 'inline-flex' : 'none';
+      localStorage.setItem(STORAGE_KEY_ADMIN, admin ? '1' : '0');
+    }
+
+    function applyCachedProjects() {
+      const cached = localStorage.getItem(STORAGE_KEY_CACHE);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            projects = parsed;
+            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+          }
+        } catch (e) {}
+      }
+    }
+
+    (function bootstrapInstantAdmin() {
+      const adminFlag = localStorage.getItem(STORAGE_KEY_ADMIN) === '1';
+      if (isGitHubConfigured() && adminFlag) {
+        applyCachedProjects();
+        setAdminStatus(true);
+        renderProjects();
+        syncInBackground();
+      } else if (isGitHubConfigured()) {
+        applyCachedProjects();
+        setAdminStatus(true);
+        renderProjects();
+        syncInBackground();
+      } else {
+        renderProjects();
+        init();
+      }
+    })();
+
+    async function syncInBackground() {
+      try {
+        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}?t=${Date.now()}`;
+        const res = await fetch(url, {
+          headers: { 'Authorization': `token ${ghConfig.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const decoded = JSON.parse(atob(data.content));
+          if (Array.isArray(decoded)) {
+            projects = decoded;
+            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+            localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            setAdminStatus(true);
+            renderProjects();
+          }
+        } else if (res.status === 404) {
+          setAdminStatus(true);
+        } else {
+          setAdminStatus(false);
+          renderProjects();
+        }
+      } catch (err) {}
     }
 
     configBtn.addEventListener('click', () => {
@@ -909,12 +980,16 @@
     });
 
     logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('gh_sync_config');
+      localStorage.removeItem(STORAGE_KEY_CONFIG);
+      localStorage.removeItem(STORAGE_KEY_CACHE);
+      localStorage.removeItem(STORAGE_KEY_ADMIN);
       ghConfig = { token: '', repo: '', path: 'projects.json' };
       ghTokenInput.value = '';
       ghRepoInput.value = '';
       configErrorMsg.style.display = 'none';
       closeConfigModal();
+      setAdminStatus(false);
+      renderProjects();
       init();
     });
 
@@ -934,8 +1009,9 @@
 
       if (success) {
         ghConfig = tempConfig;
-        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+        localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
         closeConfigModal();
+        setAdminStatus(true);
         renderProjects();
       } else {
         configErrorMsg.style.display = 'block';
@@ -951,14 +1027,15 @@
         if (res.ok) {
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
-          projects = decoded;
-          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
+          if (Array.isArray(decoded)) {
+            projects = decoded;
+            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+            localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+          }
+          setAdminStatus(true);
           return true;
         } else if (res.status === 404) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
+          setAdminStatus(true);
           return true;
         } else {
           return false;
@@ -970,33 +1047,32 @@
 
     async function init() {
       if (isGitHubConfigured()) {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-        syncStatus.className = "sync-status status-admin";
+        setAdminStatus(true);
         renderProjects();
-        testAndLoadFromGitHub(ghConfig).then(success => {
-          if (success) {
-            renderProjects();
-          }
-        });
+        syncInBackground();
         return;
       }
 
-      syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-      syncStatus.className = "sync-status";
-      renderProjects();
-
       try {
-        const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+        const rawRepo = promptRepoFallback();
         if (rawRepo) {
-          const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}`;
+          const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
           const res = await fetch(publicUrl);
           if (res.ok) {
-            projects = await res.json();
-            localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              projects = data;
+              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+            }
+            setAdminStatus(false);
             renderProjects();
+            return;
           }
         }
       } catch (e) {}
+
+      setAdminStatus(false);
+      renderProjects();
     }
 
     function promptRepoFallback() {
@@ -1013,7 +1089,8 @@
     }
 
     async function saveToGitHub() {
-      localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+      localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+      localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
       
       if (!isGitHubConfigured()) {
         renderProjects();
@@ -1049,8 +1126,7 @@
         });
 
         if (putRes.ok) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
+          setAdminStatus(true);
         }
       } catch (err) {}
       renderProjects();
@@ -1304,8 +1380,6 @@
     });
 
     addWorkForm.addEventListener('submit', handleFormSubmit);
-
-    init();
   </script>
 </body>
 </html>
