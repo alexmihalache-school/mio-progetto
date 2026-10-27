@@ -903,7 +903,7 @@
     }
 
     closeConfigModalBtn.addEventListener('click', closeConfigModal);
-    cancelConfigBtn.addEventListener('click', closeConfigModal);
+    cancelConfigModal.addEventListener('click', closeConfigModal);
     configModal.addEventListener('click', (e) => {
       if (e.target === configModal) closeConfigModal();
     });
@@ -918,7 +918,7 @@
       init();
     });
 
-    configForm.addEventListener('submit', async (e) => {
+    configForm.addEventListener('submit', (e) => {
       e.preventDefault();
       configErrorMsg.style.display = 'none';
       const token = ghTokenInput.value.trim();
@@ -930,16 +930,20 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadFromGitHub(tempConfig);
 
-      if (success) {
-        ghConfig = tempConfig;
-        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-        closeConfigModal();
-        renderProjects();
-      } else {
-        configErrorMsg.style.display = 'block';
-      }
+      // Chiusura immediata della modale per massima reattività
+      closeConfigModal();
+
+      // Verifica asincrona in background
+      testAndLoadFromGitHub(tempConfig).then(success => {
+        if (success) {
+          ghConfig = tempConfig;
+          localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+          renderProjects();
+        } else {
+          configErrorMsg.style.display = 'block';
+        }
+      });
     });
 
     async function testAndLoadFromGitHub(config) {
@@ -1011,41 +1015,50 @@
       return '';
     }
 
-    async function saveToGitHub() {
+    function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
       renderProjects();
       
-      if (!isGitHubConfigured()) return;
+      if (!isGitHubConfigured()) {
+        return;
+      }
 
-      try {
-        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
-        
-        const getRes = await fetch(url, {
-          headers: { 'Authorization': `token ${ghConfig.token}` }
-        });
-        const sha = getRes.ok ? (await getRes.json()).sha : undefined;
+      // Esecuzione in background senza bloccare l'interfaccia
+      (async () => {
+        try {
+          const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
+          
+          let sha = '';
+          const getRes = await fetch(url, {
+            headers: { 'Authorization': `token ${ghConfig.token}` }
+          });
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            sha = fileData.sha;
+          }
 
-        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
-        const bodyData = {
-          message: "Aggiornamento portfolio via interfaccia web",
-          content: contentEncoded,
-          sha
-        };
+          const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
+          const bodyData = {
+            message: "Aggiornamento portfolio via interfaccia web",
+            content: contentEncoded,
+            sha: sha || undefined
+          };
 
-        const putRes = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${ghConfig.token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bodyData)
-        });
+          const putRes = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${ghConfig.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+          });
 
-        if (putRes.ok) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
-        }
-      } catch (err) {}
+          if (putRes.ok) {
+            syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+            syncStatus.className = "sync-status status-admin";
+          }
+        } catch (err) {}
+      })();
     }
 
     function updateFilterCounts() {
@@ -1189,8 +1202,8 @@
         projects.unshift(newProject);
       }
 
-      saveToGitHub();
       closeModal();
+      saveToGitHub();
     }
 
     function openCreateModal() {
