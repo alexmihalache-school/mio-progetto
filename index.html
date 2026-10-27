@@ -930,14 +930,29 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
+      const cachedProjects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+      projects = cachedProjects;
+      closeConfigModal();
+      syncStatus.textContent = 'Stato: Verifica accesso...';
+      syncStatus.className = 'sync-status';
+      renderProjects();
+
       const success = await testAndLoadFromGitHub(tempConfig);
 
       if (success) {
         ghConfig = tempConfig;
         localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-        closeConfigModal();
+        localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
         renderProjects();
       } else {
+        projects = cachedProjects;
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+        syncStatus.className = 'sync-status';
+        renderProjects();
+        ghTokenInput.value = token;
+        ghRepoInput.value = repo;
+        logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
+        configModal.classList.add('active');
         configErrorMsg.style.display = 'block';
       }
     });
