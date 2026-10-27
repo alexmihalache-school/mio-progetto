@@ -436,7 +436,6 @@
       max-height: 180px;
       overflow-y: auto;
       padding-right: 0.4rem;
-
       scrollbar-width: thin;
       scrollbar-color: rgba(163, 18, 43, 0.5) rgba(255, 255, 255, 0.03);
     }
@@ -759,7 +758,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
-        <button class="btn-close" id="closeModalBtn">&times;</button>
+        <button class="btn-close" id="closeModalBtn">×</button>
       </div>
       <form id="addWorkForm">
         <input type="hidden" id="editProjectId">
@@ -801,7 +800,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title">Configura GitHub Sync</h3>
-        <button class="btn-close" id="closeConfigModalBtn">&times;</button>
+        <button class="btn-close" id="closeConfigModalBtn">×</button>
       </div>
       <form id="configForm">
         <div class="form-group">
@@ -969,18 +968,16 @@
     }
 
     function init() {
-      projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-      
       if (isGitHubConfigured()) {
         syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
         syncStatus.className = "sync-status status-admin";
-        renderProjects();
-        loadProjectsFromGitHub();
       } else {
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
-        renderProjects();
       }
+      
+      projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+      renderProjects();
     }
 
     async function saveToGitHub() {
@@ -1243,11 +1240,11 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
+          '&': '&',
+          '<': '<',
+          '>': '>',
+          '"': '"',
+          "'": '''
         }[m];
       });
     }
@@ -1280,3 +1277,4 @@
   </script>
 </body>
 </html>
+```eof
