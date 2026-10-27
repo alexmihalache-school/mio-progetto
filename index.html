@@ -928,18 +928,22 @@
         return;
       }
 
-      ghConfig = { token, repo, path: 'projects.json' };
-      localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-      
-      syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-      syncStatus.className = "sync-status status-admin";
-      closeConfigModal();
-      renderProjects();
+      const tempConfig = { token, repo, path: 'projects.json' };
+      const success = await testAndLoadFromGitHub(tempConfig);
 
-      fetchFromGitHub(ghConfig);
+      if (success) {
+        ghConfig = tempConfig;
+        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+        syncStatus.className = "sync-status status-admin";
+        closeConfigModal();
+        renderProjects();
+      } else {
+        configErrorMsg.style.display = 'block';
+      }
     });
 
-    async function fetchFromGitHub(config) {
+    async function testAndLoadFromGitHub(config) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
@@ -950,13 +954,17 @@
           const decoded = JSON.parse(decodeURIComponent(escape(atob(data.content))));
           projects = decoded;
           localStorage.setItem('cached_projects_data', JSON.stringify(projects));
-          renderProjects();
+          return true;
         } else if (res.status === 404) {
           projects = [];
           localStorage.setItem('cached_projects_data', JSON.stringify(projects));
-          renderProjects();
+          return true;
+        } else {
+          return false;
         }
-      } catch (err) {}
+      } catch (err) {
+        return false;
+      }
     }
 
     function init() {
@@ -971,7 +979,7 @@
         syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
         syncStatus.className = "sync-status status-admin";
         renderProjects();
-        fetchFromGitHub(ghConfig);
+        testAndLoadFromGitHub(ghConfig).then(() => renderProjects());
       } else {
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
