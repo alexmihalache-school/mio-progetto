@@ -507,6 +507,35 @@
       opacity: 0.6;
     }
 
+    .skeleton-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-red);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      min-height: 260px;
+    }
+
+    .skeleton-line {
+      height: 14px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: skeletonShine 1.3s ease-in-out infinite;
+    }
+
+    .skeleton-line.badge { width: 90px; height: 22px; border-radius: 20px; }
+    .skeleton-line.title { width: 70%; height: 22px; }
+    .skeleton-line.text { width: 100%; }
+    .skeleton-line.text.short { width: 60%; }
+
+    @keyframes skeletonShine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -737,7 +766,7 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Cerca un lavoro per titolo o descrizione...">
           </div>
-          <button class="btn-primary" id="openModalBtn">
+          <button class="btn-primary" id="openModalBtn" style="display:none;">
             <i class="fa-solid fa-plus"></i> Nuovo Lavoro
           </button>
         </div>
@@ -751,7 +780,11 @@
         </div>
       </div>
 
-      <div class="projects-grid" id="projectsGrid"></div>
+      <div class="projects-grid" id="projectsGrid">
+        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
+        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
+      </div>
     </section>
   </main>
 
@@ -855,9 +888,8 @@
     const STORAGE_KEY_ADMIN = 'gh_sync_admin_flag';
     const STORAGE_KEY_PUBLIC_CACHE = 'gh_public_cache';
 
-    let ghConfig = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG)) || { token: '', repo: '', path: 'projects.json' };
-
-    let projects = JSON.parse(localStorage.getItem(STORAGE_KEY_PROJECTS)) || [];
+    let ghConfig = { token: '', repo: '', path: 'projects.json' };
+    let projects = [];
     let activeFilter = 'all';
     let searchQuery = '';
     let projectToDeleteId = null;
@@ -902,54 +934,55 @@
         syncStatus.className = "sync-status";
       }
       openModalBtn.style.display = admin ? 'inline-flex' : 'none';
-      localStorage.setItem(STORAGE_KEY_ADMIN, admin ? '1' : '0');
     }
 
-    function applyCachedProjects() {
-      const cached = localStorage.getItem(STORAGE_KEY_CACHE);
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            projects = parsed;
-            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-          }
-        } catch (e) {}
-      }
+    function safeParse(json) {
+      try { return JSON.parse(json); } catch (e) { return null; }
     }
 
-    function applyPublicCache() {
-      const cached = localStorage.getItem(STORAGE_KEY_PUBLIC_CACHE);
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            projects = parsed;
-            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-          }
-        } catch (e) {}
-      }
+    function loadCachedProjects() {
+      const c1 = safeParse(localStorage.getItem(STORAGE_KEY_CACHE));
+      if (Array.isArray(c1) && c1.length) return c1;
+      const c2 = safeParse(localStorage.getItem(STORAGE_KEY_PROJECTS));
+      if (Array.isArray(c2) && c2.length) return c2;
+      const c3 = safeParse(localStorage.getItem(STORAGE_KEY_PUBLIC_CACHE));
+      if (Array.isArray(c3) && c3.length) return c3;
+      return [];
     }
 
-    (function bootstrapInstant() {
-      const adminFlag = localStorage.getItem(STORAGE_KEY_ADMIN) === '1';
-      if (isGitHubConfigured() && adminFlag) {
-        applyCachedProjects();
-        setAdminStatus(true);
-        renderProjects();
-        syncInBackground();
-      } else if (isGitHubConfigured()) {
-        applyCachedProjects();
-        setAdminStatus(true);
-        renderProjects();
-        syncInBackground();
+    function scheduleIdle(fn) {
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(fn, { timeout: 800 });
       } else {
-        applyPublicCache();
-        setAdminStatus(false);
-        renderProjects();
-        setTimeout(fetchPublicDataInBackground, 0);
+        setTimeout(fn, 50);
       }
-    })();
+    }
+
+    function bootstrapSync() {
+      const cfg = safeParse(localStorage.getItem(STORAGE_KEY_CONFIG));
+      if (cfg && cfg.token && cfg.repo) {
+        ghConfig = cfg;
+      }
+
+      projects = loadCachedProjects();
+
+      const configured = isGitHubConfigured();
+      setAdminStatus(configured);
+
+      renderProjects();
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scheduleIdle(() => {
+            if (isGitHubConfigured()) {
+              syncInBackground();
+            } else {
+              fetchPublicDataInBackground();
+            }
+          });
+        });
+      });
+    }
 
     async function fetchPublicDataInBackground() {
       try {
@@ -961,8 +994,10 @@
           const data = await res.json();
           if (Array.isArray(data)) {
             projects = data;
-            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-            localStorage.setItem(STORAGE_KEY_PUBLIC_CACHE, JSON.stringify(projects));
+            try {
+              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+              localStorage.setItem(STORAGE_KEY_PUBLIC_CACHE, JSON.stringify(projects));
+            } catch (e) {}
             setAdminStatus(false);
             renderProjects();
           }
@@ -978,11 +1013,14 @@
         });
         if (res.ok) {
           const data = await res.json();
-          const decoded = JSON.parse(atob(data.content));
+          let decoded;
+          try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
           if (Array.isArray(decoded)) {
             projects = decoded;
-            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-            localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            try {
+              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+              localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            } catch (e) {}
             setAdminStatus(true);
             renderProjects();
           }
@@ -1025,7 +1063,7 @@
       closeConfigModal();
       setAdminStatus(false);
       renderProjects();
-      setTimeout(fetchPublicDataInBackground, 0);
+      scheduleIdle(fetchPublicDataInBackground);
     });
 
     configForm.addEventListener('submit', async (e) => {
@@ -1061,11 +1099,14 @@
         });
         if (res.ok) {
           const data = await res.json();
-          const decoded = JSON.parse(atob(data.content));
+          let decoded;
+          try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
           if (Array.isArray(decoded)) {
             projects = decoded;
-            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-            localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            try {
+              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+              localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            } catch (e) {}
           }
           setAdminStatus(true);
           return true;
@@ -1094,8 +1135,10 @@
     }
 
     async function saveToGitHub() {
-      localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-      localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+      try {
+        localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+        localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+      } catch (e) {}
       
       if (!isGitHubConfigured()) {
         renderProjects();
@@ -1164,20 +1207,17 @@
     function renderProjects() {
       const isSynced = isGitHubConfigured();
 
-      if (isSynced) {
-        openModalBtn.style.display = 'inline-flex';
-      } else {
-        openModalBtn.style.display = 'none';
-      }
+      openModalBtn.style.display = isSynced ? 'inline-flex' : 'none';
 
       updateFilterCounts();
       projectsGrid.innerHTML = '';
 
       const filtered = projects.filter(project => {
         const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
-        const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            project.category.toLowerCase().includes(searchQuery.toLowerCase());
+        const q = searchQuery.toLowerCase();
+        const matchesSearch = (project.title || '').toLowerCase().includes(q) || 
+                            (project.description || '').toLowerCase().includes(q) ||
+                            (project.category || '').toLowerCase().includes(q);
         return matchesCategory && matchesSearch;
       });
 
@@ -1192,9 +1232,7 @@
         if (activeFilter === 'all') {
           const orderA = categoryOrder[a.category] || 99;
           const orderB = categoryOrder[b.category] || 99;
-          if (orderA !== orderB) {
-            return orderA - orderB;
-          }
+          if (orderA !== orderB) return orderA - orderB;
           return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
         } else {
           return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
@@ -1211,6 +1249,8 @@
         `;
         return;
       }
+
+      const frag = document.createDocumentFragment();
 
       filtered.forEach(project => {
         const card = document.createElement('div');
@@ -1245,8 +1285,9 @@
             </a>
           </div>
         `;
-        projectsGrid.appendChild(card);
+        frag.appendChild(card);
       });
+      projectsGrid.appendChild(frag);
     }
 
     function handleFormSubmit(e) {
@@ -1351,7 +1392,8 @@
     }
 
     function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, function(m) {
+      if (str == null) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
         return {
           '&': '&amp;',
           '<': '&lt;',
@@ -1385,6 +1427,8 @@
     });
 
     addWorkForm.addEventListener('submit', handleFormSubmit);
+
+    bootstrapSync();
   </script>
 </body>
 </html>
