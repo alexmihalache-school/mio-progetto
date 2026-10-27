@@ -849,7 +849,7 @@
   </footer>
 
   <script>
-    let projects = [];
+    let projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
     let activeFilter = 'all';
     let searchQuery = '';
     let projectToDeleteId = null;
@@ -882,6 +882,8 @@
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    renderProjects();
 
     function isGitHubConfigured() {
       return Boolean(ghConfig.token && ghConfig.repo);
@@ -950,11 +952,11 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
+          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
         } else if (res.status === 404) {
-          projects = [];
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
@@ -972,7 +974,6 @@
         if (!success) {
           syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
           syncStatus.className = "sync-status";
-          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         }
       } else {
         try {
@@ -982,6 +983,7 @@
             const res = await fetch(publicUrl);
             if (res.ok) {
               projects = await res.json();
+              localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
               syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
               syncStatus.className = "sync-status";
               renderProjects();
@@ -990,7 +992,6 @@
           }
         } catch (e) {}
 
-        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
       }
