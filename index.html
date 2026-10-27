@@ -853,6 +853,7 @@
     const STORAGE_KEY_CONFIG = 'gh_sync_config';
     const STORAGE_KEY_CACHE = 'gh_sync_cache';
     const STORAGE_KEY_ADMIN = 'gh_sync_admin_flag';
+    const STORAGE_KEY_PUBLIC_CACHE = 'gh_public_cache';
 
     let ghConfig = JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG)) || { token: '', repo: '', path: 'projects.json' };
 
@@ -917,7 +918,20 @@
       }
     }
 
-    (function bootstrapInstantAdmin() {
+    function applyPublicCache() {
+      const cached = localStorage.getItem(STORAGE_KEY_PUBLIC_CACHE);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            projects = parsed;
+            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+          }
+        } catch (e) {}
+      }
+    }
+
+    (function bootstrapInstant() {
       const adminFlag = localStorage.getItem(STORAGE_KEY_ADMIN) === '1';
       if (isGitHubConfigured() && adminFlag) {
         applyCachedProjects();
@@ -930,10 +944,31 @@
         renderProjects();
         syncInBackground();
       } else {
+        applyPublicCache();
+        setAdminStatus(false);
         renderProjects();
-        init();
+        setTimeout(fetchPublicDataInBackground, 0);
       }
     })();
+
+    async function fetchPublicDataInBackground() {
+      try {
+        const rawRepo = promptRepoFallback();
+        if (!rawRepo) return;
+        const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${Date.now()}`;
+        const res = await fetch(publicUrl, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            projects = data;
+            localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+            localStorage.setItem(STORAGE_KEY_PUBLIC_CACHE, JSON.stringify(projects));
+            setAdminStatus(false);
+            renderProjects();
+          }
+        }
+      } catch (e) {}
+    }
 
     async function syncInBackground() {
       try {
@@ -990,7 +1025,7 @@
       closeConfigModal();
       setAdminStatus(false);
       renderProjects();
-      init();
+      setTimeout(fetchPublicDataInBackground, 0);
     });
 
     configForm.addEventListener('submit', async (e) => {
@@ -1043,36 +1078,6 @@
       } catch (err) {
         return false;
       }
-    }
-
-    async function init() {
-      if (isGitHubConfigured()) {
-        setAdminStatus(true);
-        renderProjects();
-        syncInBackground();
-        return;
-      }
-
-      try {
-        const rawRepo = promptRepoFallback();
-        if (rawRepo) {
-          const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-          const res = await fetch(publicUrl);
-          if (res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data)) {
-              projects = data;
-              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-            }
-            setAdminStatus(false);
-            renderProjects();
-            return;
-          }
-        }
-      } catch (e) {}
-
-      setAdminStatus(false);
-      renderProjects();
     }
 
     function promptRepoFallback() {
