@@ -849,7 +849,7 @@
   </footer>
 
   <script>
-    let projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+    let projects = [];
     let activeFilter = 'all';
     let searchQuery = '';
     let projectToDeleteId = null;
@@ -883,8 +883,6 @@
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    renderProjects();
-
     function isGitHubConfigured() {
       return Boolean(ghConfig.token && ghConfig.repo);
     }
@@ -903,7 +901,7 @@
     }
 
     closeConfigModalBtn.addEventListener('click', closeConfigModal);
-    cancelConfigModal.addEventListener('click', closeConfigModal);
+    cancelConfigBtn.addEventListener('click', closeConfigModal);
     configModal.addEventListener('click', (e) => {
       if (e.target === configModal) closeConfigModal();
     });
@@ -918,7 +916,7 @@
       init();
     });
 
-    configForm.addEventListener('submit', (e) => {
+    configForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       configErrorMsg.style.display = 'none';
       const token = ghTokenInput.value.trim();
@@ -930,28 +928,28 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
+      const success = await testAndLoadFromGitHub(tempConfig);
 
-      // Chiusura immediata della modale per massima reattività
-      closeConfigModal();
-
-      // Verifica asincrona in background
-      testAndLoadFromGitHub(tempConfig).then(success => {
-        if (success) {
-          ghConfig = tempConfig;
-          localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-          renderProjects();
-        } else {
-          configErrorMsg.style.display = 'block';
-        }
-      });
+      if (success) {
+        ghConfig = tempConfig;
+        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+        closeConfigModal();
+        renderProjects();
+      } else {
+        configErrorMsg.style.display = 'block';
+      }
     });
 
     async function testAndLoadFromGitHub(config) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
         const res = await fetch(url, {
-          headers: { 'Authorization': `token ${config.token}` }
+          headers: { 'Authorization': `token ${config.token}` },
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
@@ -961,6 +959,8 @@
           syncStatus.className = "sync-status status-admin";
           return true;
         } else if (res.status === 404) {
+          projects = [];
+          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
@@ -973,33 +973,53 @@
     }
 
     async function init() {
-      if (isGitHubConfigured()) {
-        const success = await testAndLoadFromGitHub(ghConfig);
-        if (!success) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-          syncStatus.className = "sync-status";
-        }
-      } else {
+      const cachedProjects = localStorage.getItem('alex_projects_v4');
+      if (cachedProjects) {
         try {
-          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-          if (rawRepo) {
-            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-            const res = await fetch(publicUrl);
-            if (res.ok) {
-              projects = await res.json();
-              localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
-              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-              syncStatus.className = "sync-status";
-              renderProjects();
-              return;
-            }
-          }
-        } catch (e) {}
+          projects = JSON.parse(cachedProjects);
+        } catch (e) {
+          projects = [];
+        }
+      }
 
+      if (isGitHubConfigured()) {
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+        syncStatus.className = "sync-status status-admin";
+        renderProjects();
+        
+        setTimeout(() => {
+          testAndLoadFromGitHub(ghConfig).then(success => {
+            if (success) {
+              renderProjects();
+            }
+          });
+        }, 10);
+      } else {
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
+        renderProjects();
+
+        setTimeout(async () => {
+          try {
+            const rawRepo = promptRepoFallback();
+            if (rawRepo) {
+              const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 5000);
+              const res = await fetch(publicUrl, { signal: controller.signal });
+              clearTimeout(timeoutId);
+              if (res.ok) {
+                const remoteProjects = await res.json();
+                if (JSON.stringify(remoteProjects) !== JSON.stringify(projects)) {
+                  projects = remoteProjects;
+                  localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+                  renderProjects();
+                }
+              }
+            }
+          } catch (e) {}
+        }, 10);
       }
-      renderProjects();
     }
 
     function promptRepoFallback() {
@@ -1015,7 +1035,7 @@
       return '';
     }
 
-    function saveToGitHub() {
+    async function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
       renderProjects();
       
@@ -1023,42 +1043,39 @@
         return;
       }
 
-      // Esecuzione in background senza bloccare l'interfaccia
-      (async () => {
-        try {
-          const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
-          
-          let sha = '';
-          const getRes = await fetch(url, {
-            headers: { 'Authorization': `token ${ghConfig.token}` }
-          });
-          if (getRes.ok) {
-            const fileData = await getRes.json();
-            sha = fileData.sha;
-          }
+      try {
+        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
+        
+        let sha = '';
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `token ${ghConfig.token}` }
+        });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+        }
 
-          const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
-          const bodyData = {
-            message: "Aggiornamento portfolio via interfaccia web",
-            content: contentEncoded,
-            sha: sha || undefined
-          };
+        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
+        const bodyData = {
+          message: "Aggiornamento portfolio via interfaccia web",
+          content: contentEncoded,
+          sha: sha || undefined
+        };
 
-          const putRes = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${ghConfig.token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bodyData)
-          });
+        const putRes = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${ghConfig.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyData)
+        });
 
-          if (putRes.ok) {
-            syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-            syncStatus.className = "sync-status status-admin";
-          }
-        } catch (err) {}
-      })();
+        if (putRes.ok) {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+          syncStatus.className = "sync-status status-admin";
+        }
+      } catch (err) {}
     }
 
     function updateFilterCounts() {
@@ -1202,8 +1219,8 @@
         projects.unshift(newProject);
       }
 
-      closeModal();
       saveToGitHub();
+      closeModal();
     }
 
     function openCreateModal() {
@@ -1228,7 +1245,7 @@
 
       modalTitleText.textContent = 'Modifica Lavoro / Tag';
       saveBtnText.textContent = 'Aggiorna Lavoro';
-      toggleModal(true);
+      toggleModal(type => { workModal.classList.toggle('active', type); });
     }
 
     window.promptDeleteProject = function(id, event) {
@@ -1250,7 +1267,7 @@
 
     confirmDeleteBtn.addEventListener('click', () => {
       if (projectToDeleteId) {
-        projects = projects.filter(p => p.id !== projectToDeleteId);
+        projects = projects.projects = projects.filter(p => p.id !== projectToDeleteId);
         closeDeleteModal();
         saveToGitHub();
       }
