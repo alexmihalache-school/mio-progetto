@@ -928,7 +928,7 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadFromGitHub(tempConfig);
+      const success = await loadProjectsFromGitHub(tempConfig);
 
       if (success) {
         ghConfig = tempConfig;
@@ -940,7 +940,7 @@
       }
     });
 
-    async function testAndLoadFromGitHub(config) {
+    async function loadProjectsFromGitHub(config = ghConfig) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
@@ -948,15 +948,17 @@
         });
         if (res.ok) {
           const data = await res.json();
-          const decoded = JSON.parse(atob(data.content));
-          projects = decoded;
+          projects = JSON.parse(atob(data.content));
+          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
+          renderProjects();
           return true;
         } else if (res.status === 404) {
           projects = [];
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
+          renderProjects();
           return true;
         } else {
           return false;
@@ -966,48 +968,19 @@
       }
     }
 
-    async function init() {
+    function init() {
+      projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+      
       if (isGitHubConfigured()) {
-        const success = await testAndLoadFromGitHub(ghConfig);
-        if (!success) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-          syncStatus.className = "sync-status";
-          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        }
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+        syncStatus.className = "sync-status status-admin";
+        renderProjects();
+        loadProjectsFromGitHub();
       } else {
-        try {
-          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-          if (rawRepo) {
-            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-            const res = await fetch(publicUrl);
-            if (res.ok) {
-              projects = await res.json();
-              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-              syncStatus.className = "sync-status";
-              renderProjects();
-              return;
-            }
-          }
-        } catch (e) {}
-
-        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
+        renderProjects();
       }
-      renderProjects();
-    }
-
-    function promptRepoFallback() {
-      try {
-        const hostnameParts = window.location.hostname.split('.');
-        if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
-          const username = hostnameParts[0];
-          const pathSegments = window.location.pathname.split('/').filter(Boolean);
-          const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
-          return `${username}/${repoName}`;
-        }
-      } catch (err) {}
-      return '';
     }
 
     async function saveToGitHub() {
