@@ -970,32 +970,33 @@
 
     async function init() {
       if (isGitHubConfigured()) {
-        const success = await testAndLoadFromGitHub(ghConfig);
-        if (!success) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-          syncStatus.className = "sync-status";
-        }
-      } else {
-        try {
-          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-          if (rawRepo) {
-            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-            const res = await fetch(publicUrl);
-            if (res.ok) {
-              projects = await res.json();
-              localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
-              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-              syncStatus.className = "sync-status";
-              renderProjects();
-              return;
-            }
+        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+        syncStatus.className = "sync-status status-admin";
+        renderProjects();
+        testAndLoadFromGitHub(ghConfig).then(success => {
+          if (success) {
+            renderProjects();
           }
-        } catch (e) {}
-
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-        syncStatus.className = "sync-status";
+        });
+        return;
       }
+
+      syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+      syncStatus.className = "sync-status";
       renderProjects();
+
+      try {
+        const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+        if (rawRepo) {
+          const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}`;
+          const res = await fetch(publicUrl);
+          if (res.ok) {
+            projects = await res.json();
+            localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+            renderProjects();
+          }
+        }
+      } catch (e) {}
     }
 
     function promptRepoFallback() {
