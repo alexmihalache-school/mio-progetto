@@ -436,6 +436,7 @@
       max-height: 180px;
       overflow-y: auto;
       padding-right: 0.4rem;
+
       scrollbar-width: thin;
       scrollbar-color: rgba(163, 18, 43, 0.5) rgba(255, 255, 255, 0.03);
     }
@@ -758,7 +759,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
-        <button class="btn-close" id="closeModalBtn">×</button>
+        <button class="btn-close" id="closeModalBtn">&times;</button>
       </div>
       <form id="addWorkForm">
         <input type="hidden" id="editProjectId">
@@ -800,7 +801,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title">Configura GitHub Sync</h3>
-        <button class="btn-close" id="closeConfigModalBtn">×</button>
+        <button class="btn-close" id="closeConfigModalBtn">&times;</button>
       </div>
       <form id="configForm">
         <div class="form-group">
@@ -927,7 +928,7 @@
       }
 
       const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await loadProjectsFromGitHub(tempConfig);
+      const success = await testAndLoadFromGitHub(tempConfig);
 
       if (success) {
         ghConfig = tempConfig;
@@ -939,7 +940,7 @@
       }
     });
 
-    async function loadProjectsFromGitHub(config = ghConfig) {
+    async function testAndLoadFromGitHub(config) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
@@ -947,17 +948,15 @@
         });
         if (res.ok) {
           const data = await res.json();
-          projects = JSON.parse(atob(data.content));
-          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+          const decoded = JSON.parse(atob(data.content));
+          projects = decoded;
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
-          renderProjects();
           return true;
         } else if (res.status === 404) {
           projects = [];
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
-          renderProjects();
           return true;
         } else {
           return false;
@@ -967,17 +966,48 @@
       }
     }
 
-    function init() {
+    async function init() {
       if (isGitHubConfigured()) {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-        syncStatus.className = "sync-status status-admin";
+        const success = await testAndLoadFromGitHub(ghConfig);
+        if (!success) {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+          syncStatus.className = "sync-status";
+          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+        }
       } else {
+        try {
+          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+          if (rawRepo) {
+            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
+            const res = await fetch(publicUrl);
+            if (res.ok) {
+              projects = await res.json();
+              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+              syncStatus.className = "sync-status";
+              renderProjects();
+              return;
+            }
+          }
+        } catch (e) {}
+
+        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
         syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
         syncStatus.className = "sync-status";
       }
-      
-      projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
       renderProjects();
+    }
+
+    function promptRepoFallback() {
+      try {
+        const hostnameParts = window.location.hostname.split('.');
+        if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
+          const username = hostnameParts[0];
+          const pathSegments = window.location.pathname.split('/').filter(Boolean);
+          const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
+          return `${username}/${repoName}`;
+        }
+      } catch (err) {}
+      return '';
     }
 
     async function saveToGitHub() {
@@ -1240,11 +1270,11 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
-          '&': '&',
-          '<': '<',
-          '>': '>',
-          '"': '"',
-          "'": '''
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
         }[m];
       });
     }
@@ -1277,4 +1307,3 @@
   </script>
 </body>
 </html>
-```eof
