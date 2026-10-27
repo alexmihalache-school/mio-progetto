@@ -657,6 +657,15 @@
       color: #ffffff;
     }
 
+    .config-error-msg {
+      display: none;
+      color: #ff4d4d;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
     footer {
       text-align: center;
       padding: 2.5rem 1rem;
@@ -805,6 +814,8 @@
           <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required>
         </div>
 
+        <div class="config-error-msg" id="configErrorMsg">PAT/Repo sbagliata.</div>
+
         <div class="modal-footer">
           <button type="button" class="btn-logout" id="logoutBtn">
             <i class="fa-solid fa-right-from-bracket"></i> Esci
@@ -865,6 +876,7 @@
     const configForm = document.getElementById('configForm');
     const ghTokenInput = document.getElementById('ghToken');
     const ghRepoInput = document.getElementById('ghRepo');
+    const configErrorMsg = document.getElementById('configErrorMsg');
     const syncStatus = document.getElementById('syncStatus');
 
     const deleteModal = document.getElementById('deleteModal');
@@ -878,12 +890,14 @@
     configBtn.addEventListener('click', () => {
       ghTokenInput.value = ghConfig.token || '';
       ghRepoInput.value = ghConfig.repo || '';
+      configErrorMsg.style.display = 'none';
       logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
       configModal.classList.add('active');
     });
 
     function closeConfigModal() {
       configModal.classList.remove('active');
+      configErrorMsg.style.display = 'none';
     }
 
     closeConfigModalBtn.addEventListener('click', closeConfigModal);
@@ -901,18 +915,52 @@
       init();
     });
 
-    configForm.addEventListener('submit', (e) => {
+    configForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const token = ghTokenInput.value.trim();
       const repo = ghRepoInput.value.trim();
 
       if (!token || !repo) return;
 
-      ghConfig = { token, repo, path: 'projects.json' };
-      localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-      closeConfigModal();
-      loadProjectsFromGitHub();
+      configErrorMsg.style.display = 'none';
+      const tempConfig = { token, repo, path: 'projects.json' };
+      const success = await testAndLoadGitHubConfig(tempConfig);
+
+      if (success) {
+        ghConfig = tempConfig;
+        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+        closeConfigModal();
+      } else {
+        configErrorMsg.style.display = 'block';
+      }
     });
+
+    async function testAndLoadGitHubConfig(cfg) {
+      try {
+        const url = `https://api.github.com/repos/${cfg.repo}/contents/${cfg.path}`;
+        const res = await fetch(url, {
+          headers: { 'Authorization': `token ${cfg.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const decoded = JSON.parse(atob(data.content));
+          projects = decoded;
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+          syncStatus.className = "sync-status status-admin";
+          renderProjects();
+          return true;
+        } else if (res.status === 404) {
+          projects = [];
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+          syncStatus.className = "sync-status status-admin";
+          renderProjects();
+          return true;
+        }
+        return false;
+      } catch (err) {
+        return false;
+      }
+    }
 
     async function init() {
       if (isGitHubConfigured()) {
