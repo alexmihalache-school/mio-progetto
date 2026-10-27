@@ -893,6 +893,7 @@
     let activeFilter = 'all';
     let searchQuery = '';
     let projectToDeleteId = null;
+    let pendingConfigValidation = null;
 
     const projectsGrid = document.getElementById('projectsGrid');
     const searchInput = document.getElementById('searchInput');
@@ -1026,7 +1027,7 @@
           }
         } else if (res.status === 404) {
           setAdminStatus(true);
-        } else {
+        } else if (res.status === 401 || res.status === 403) {
           setAdminStatus(false);
           renderProjects();
         }
@@ -1066,7 +1067,7 @@
       scheduleIdle(fetchPublicDataInBackground);
     });
 
-    configForm.addEventListener('submit', async (e) => {
+    configForm.addEventListener('submit', (e) => {
       e.preventDefault();
       configErrorMsg.style.display = 'none';
       const token = ghTokenInput.value.trim();
@@ -1077,21 +1078,27 @@
         return;
       }
 
-      const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadFromGitHub(tempConfig);
+      const newConfig = { token, repo, path: 'projects.json' };
+      ghConfig = newConfig;
 
-      if (success) {
-        ghConfig = tempConfig;
+      try {
         localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
-        closeConfigModal();
-        setAdminStatus(true);
-        renderProjects();
-      } else {
-        configErrorMsg.style.display = 'block';
+        localStorage.setItem(STORAGE_KEY_ADMIN, '1');
+      } catch (err) {}
+
+      closeConfigModal();
+      setAdminStatus(true);
+      renderProjects();
+
+      if (pendingConfigValidation) {
+        clearTimeout(pendingConfigValidation);
       }
+      pendingConfigValidation = setTimeout(() => {
+        validateConfigInBackground(newConfig);
+      }, 0);
     });
 
-    async function testAndLoadFromGitHub(config) {
+    async function validateConfigInBackground(config) {
       try {
         const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
         const res = await fetch(url, {
@@ -1107,17 +1114,36 @@
               localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
               localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
             } catch (e) {}
+            setAdminStatus(true);
+            renderProjects();
           }
-          setAdminStatus(true);
-          return true;
         } else if (res.status === 404) {
           setAdminStatus(true);
-          return true;
         } else {
-          return false;
+          ghConfig = { token: '', repo: '', path: 'projects.json' };
+          try {
+            localStorage.removeItem(STORAGE_KEY_CONFIG);
+            localStorage.removeItem(STORAGE_KEY_ADMIN);
+          } catch (e) {}
+          setAdminStatus(false);
+          renderProjects();
+          ghTokenInput.value = config.token;
+          ghRepoInput.value = config.repo;
+          configErrorMsg.style.display = 'block';
+          configModal.classList.add('active');
         }
       } catch (err) {
-        return false;
+        ghConfig = { token: '', repo: '', path: 'projects.json' };
+        try {
+          localStorage.removeItem(STORAGE_KEY_CONFIG);
+          localStorage.removeItem(STORAGE_KEY_ADMIN);
+        } catch (e) {}
+        setAdminStatus(false);
+        renderProjects();
+        ghTokenInput.value = config.token;
+        ghRepoInput.value = config.repo;
+        configErrorMsg.style.display = 'block';
+        configModal.classList.add('active');
       }
     }
 
