@@ -1013,29 +1013,23 @@
 
     async function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+      renderProjects();
       
-      if (!isGitHubConfigured()) {
-        renderProjects();
-        return;
-      }
+      if (!isGitHubConfigured()) return;
 
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         
-        let sha = '';
         const getRes = await fetch(url, {
           headers: { 'Authorization': `token ${ghConfig.token}` }
         });
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-        }
+        const sha = getRes.ok ? (await getRes.json()).sha : undefined;
 
         const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
         const bodyData = {
           message: "Aggiornamento portfolio via interfaccia web",
           content: contentEncoded,
-          sha: sha || undefined
+          sha
         };
 
         const putRes = await fetch(url, {
@@ -1052,7 +1046,6 @@
           syncStatus.className = "sync-status status-admin";
         }
       } catch (err) {}
-      renderProjects();
     }
 
     function updateFilterCounts() {
