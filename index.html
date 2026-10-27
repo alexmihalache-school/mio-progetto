@@ -950,13 +950,11 @@
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
         } else if (res.status === 404) {
           projects = [];
-          localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
           syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
           syncStatus.className = "sync-status status-admin";
           return true;
@@ -968,44 +966,31 @@
       }
     }
 
-    function init() {
-      projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+    async function init() {
+      projects = [];
+      renderProjects();
 
       if (isGitHubConfigured()) {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-        syncStatus.className = "sync-status status-admin";
-        renderProjects();
-
-        setTimeout(() => {
-          testAndLoadFromGitHub(ghConfig).then(success => {
-            if (success) {
-              renderProjects();
-            } else {
-              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-              syncStatus.className = "sync-status";
-              renderProjects();
-            }
-          });
-        }, 10);
+        testAndLoadFromGitHub(ghConfig).then(success => {
+          if (success) {
+            renderProjects();
+          }
+        });
       } else {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-        syncStatus.className = "sync-status";
-        renderProjects();
-
-        setTimeout(async () => {
-          try {
-            const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-            if (rawRepo) {
-              const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-              const res = await fetch(publicUrl);
+        try {
+          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
+          if (rawRepo) {
+            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
+            fetch(publicUrl).then(async res => {
               if (res.ok) {
                 projects = await res.json();
-                localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
+                syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+                syncStatus.className = "sync-status";
                 renderProjects();
               }
-            }
-          } catch (e) {}
-        }, 10);
+            });
+          }
+        } catch (e) {}
       }
     }
 
@@ -1023,8 +1008,6 @@
     }
 
     async function saveToGitHub() {
-      localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
-      
       if (!isGitHubConfigured()) {
         renderProjects();
         return;
