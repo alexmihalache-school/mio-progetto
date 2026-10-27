@@ -157,11 +157,7 @@
       color: var(--text-muted);
     }
 
-    .sync-status .status-role {
-      color: var(--text-main);
-    }
-
-    .sync-status.status-admin .status-role {
+    .sync-status.status-admin {
       color: var(--red-accent);
       font-weight: 600;
     }
@@ -436,7 +432,6 @@
       max-height: 180px;
       overflow-y: auto;
       padding-right: 0.4rem;
-
       scrollbar-width: thin;
       scrollbar-color: rgba(163, 18, 43, 0.5) rgba(255, 255, 255, 0.03);
     }
@@ -610,26 +605,15 @@
       box-shadow: 0 0 10px rgba(163, 18, 43, 0.3);
     }
 
-    .config-error-msg {
-      display: none;
-      color: var(--red-hover);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-top: 0.8rem;
-      margin-bottom: 0.5rem;
-    }
-
     .modal-footer {
       display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 0.8rem;
+      justify-content: flex-end;
+      gap: 1rem;
       margin-top: 2rem;
-      flex-wrap: wrap;
     }
 
     .btn-secondary {
-      padding: 0.8rem 1.2rem;
+      padding: 0.8rem 1.5rem;
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
@@ -637,33 +621,11 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
-      white-space: nowrap;
     }
 
     .btn-secondary:hover {
       color: var(--text-main);
       border-color: var(--text-muted);
-    }
-
-    .btn-logout {
-      padding: 0.8rem 1.2rem;
-      background: rgba(139, 0, 22, 0.2);
-      border: 1px solid var(--red-accent);
-      color: #ff6b6b;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      white-space: nowrap;
-    }
-
-    .btn-logout:hover {
-      background: var(--red-deep);
-      color: #ffffff;
     }
 
     footer {
@@ -693,14 +655,6 @@
         flex-direction: column;
         align-items: flex-start;
       }
-      .modal-footer {
-        flex-direction: column;
-        width: 100%;
-      }
-      .modal-footer button {
-        width: 100%;
-        justify-content: center;
-      }
     }
   </style>
 </head>
@@ -712,9 +666,9 @@
   <header>
     <a href="#" class="logo">ITT Cannizzaro Rho<span>.</span></a>
     <div class="header-actions">
-      <span class="sync-status" id="syncStatus">Stato: <span class="status-role">Utente</span></span>
+      <span class="sync-status" id="syncStatus">Stato: Locale</span>
       <button class="btn-sync" id="configBtn" title="Configura GitHub Sync">
-        <i class="fa-solid fa-gear"></i> Dashboard
+        <i class="fa-solid fa-gear"></i> Configura GitHub
       </button>
     </div>
   </header>
@@ -759,14 +713,14 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title" id="modalTitleText">Aggiungi Nuovo Lavoro</h3>
-        <button class="btn-close" id="closeModalBtn">&times;</button>
+        <button class="btn-close" id="closeModalBtn">×</button>
       </div>
       <form id="addWorkForm">
         <input type="hidden" id="editProjectId">
         
         <div class="form-group">
           <label class="form-label" for="workTitle">Titolo del Progetto *</label>
-          <input type="text" id="workTitle" class="form-input" placeholder="Esempio" required>
+          <input type="text" id="workTitle" class="form-input" placeholder="Es. E-commerce di Lusso" required>
         </div>
 
         <div class="form-group">
@@ -801,25 +755,20 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 class="modal-title">Configura GitHub Sync</h3>
-        <button class="btn-close" id="closeConfigModalBtn">&times;</button>
+        <button class="btn-close" id="closeConfigModalBtn">×</button>
       </div>
       <form id="configForm">
         <div class="form-group">
           <label class="form-label" for="ghToken">GitHub Personal Access Token (PAT) *</label>
-          <input type="password" id="ghToken" class="form-input" placeholder="token (ghp_...)" required>
+          <input type="password" id="ghToken" class="form-input" placeholder="Inserisci il token (es. ghp_...)" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="ghRepo">Repository (Username / Nome Repo) *</label>
-          <input type="text" id="ghRepo" class="form-input" placeholder="user.github.io/repo" required>
+          <input type="text" id="ghRepo" class="form-input" placeholder="es. tuonome/tuonome.github.io" required>
         </div>
 
-        <div class="config-error-msg" id="configErrorMsg">PAT/Repo sbagliata.</div>
-
         <div class="modal-footer">
-          <button type="button" class="btn-logout" id="logoutBtn">
-            <i class="fa-solid fa-right-from-bracket"></i> Esci
-          </button>
           <button type="button" class="btn-secondary" id="cancelConfigBtn">Annulla</button>
           <button type="submit" class="btn-primary">Salva Configurazione</button>
         </div>
@@ -844,8 +793,7 @@
   </div>
 
   <footer>
-    <p>Tempo previsto di aggiornamento: 2/5 minuti.</p>
-    <p>© Diritti riservati.</p>
+    <p>Diritti riservati.</p>
   </footer>
 
   <script>
@@ -872,32 +820,23 @@
     const configModal = document.getElementById('configModal');
     const closeConfigModalBtn = document.getElementById('closeConfigModalBtn');
     const cancelConfigBtn = document.getElementById('cancelConfigBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
     const configForm = document.getElementById('configForm');
     const ghTokenInput = document.getElementById('ghToken');
     const ghRepoInput = document.getElementById('ghRepo');
-    const configErrorMsg = document.getElementById('configErrorMsg');
     const syncStatus = document.getElementById('syncStatus');
 
     const deleteModal = document.getElementById('deleteModal');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
-    function isGitHubConfigured() {
-      return Boolean(ghConfig.token && ghConfig.repo);
-    }
-
     configBtn.addEventListener('click', () => {
       ghTokenInput.value = ghConfig.token || '';
       ghRepoInput.value = ghConfig.repo || '';
-      configErrorMsg.style.display = 'none';
-      logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
       configModal.classList.add('active');
     });
 
     function closeConfigModal() {
       configModal.classList.remove('active');
-      configErrorMsg.style.display = 'none';
     }
 
     closeConfigModalBtn.addEventListener('click', closeConfigModal);
@@ -906,118 +845,61 @@
       if (e.target === configModal) closeConfigModal();
     });
 
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('gh_sync_config');
-      ghConfig = { token: '', repo: '', path: 'projects.json' };
-      ghTokenInput.value = '';
-      ghRepoInput.value = '';
-      configErrorMsg.style.display = 'none';
-      closeConfigModal();
-      init();
-    });
-
-    configForm.addEventListener('submit', async (e) => {
+    configForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      configErrorMsg.style.display = 'none';
       const token = ghTokenInput.value.trim();
       const repo = ghRepoInput.value.trim();
 
-      if (!token || !repo) {
-        configErrorMsg.style.display = 'block';
-        return;
-      }
+      if (!token || !repo) return;
 
-      const tempConfig = { token, repo, path: 'projects.json' };
-      const success = await testAndLoadFromGitHub(tempConfig);
-
-      if (success) {
-        ghConfig = tempConfig;
-        localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
-        closeConfigModal();
-        renderProjects();
-      } else {
-        configErrorMsg.style.display = 'block';
-      }
+      ghConfig = { token, repo, path: 'projects.json' };
+      localStorage.setItem('gh_sync_config', JSON.stringify(ghConfig));
+      closeConfigModal();
+      loadProjectsFromGitHub();
     });
 
-    async function testAndLoadFromGitHub(config) {
+    async function init() {
+      if (ghConfig.token && ghConfig.repo) {
+        await loadProjectsFromGitHub();
+      } else {
+        projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
+        syncStatus.textContent = "Stato: Locale";
+        renderProjects();
+      }
+    }
+
+    async function loadProjectsFromGitHub() {
+      syncStatus.textContent = "Stato: Caricamento da GitHub...";
       try {
-        const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
+        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         const res = await fetch(url, {
-          headers: { 'Authorization': `token ${config.token}` }
+          headers: { 'Authorization': `token ${ghConfig.token}` }
         });
         if (res.ok) {
           const data = await res.json();
           const decoded = JSON.parse(atob(data.content));
           projects = decoded;
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
-          return true;
-        } else if (res.status === 404) {
-          projects = [];
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
-          return true;
+          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
         } else {
-          return false;
+          projects = [];
+          syncStatus.textContent = "Stato: File projects.json non trovato (verrà creato al primo salvataggio)";
         }
       } catch (err) {
-        return false;
-      }
-    }
-
-    async function init() {
-      if (isGitHubConfigured()) {
-        const success = await testAndLoadFromGitHub(ghConfig);
-        if (!success) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-          syncStatus.className = "sync-status";
-          projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        }
-      } else {
-        try {
-          const rawRepo = ghRepoInput.value.trim() || promptRepoFallback();
-          if (rawRepo) {
-            const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${new Date().getTime()}`;
-            const res = await fetch(publicUrl);
-            if (res.ok) {
-              projects = await res.json();
-              syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-              syncStatus.className = "sync-status";
-              renderProjects();
-              return;
-            }
-          }
-        } catch (e) {}
-
+        syncStatus.textContent = "Stato: Errore connessione GitHub ❌";
         projects = JSON.parse(localStorage.getItem('alex_projects_v4')) || [];
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-        syncStatus.className = "sync-status";
       }
       renderProjects();
-    }
-
-    function promptRepoFallback() {
-      try {
-        const hostnameParts = window.location.hostname.split('.');
-        if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
-          const username = hostnameParts[0];
-          const pathSegments = window.location.pathname.split('/').filter(Boolean);
-          const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
-          return `${username}/${repoName}`;
-        }
-      } catch (err) {}
-      return '';
     }
 
     async function saveToGitHub() {
       localStorage.setItem('alex_projects_v4', JSON.stringify(projects));
       
-      if (!isGitHubConfigured()) {
+      if (!ghConfig.token || !ghConfig.repo) {
         renderProjects();
         return;
       }
 
+      syncStatus.textContent = "Stato: Salvataggio su GitHub in corso...";
       try {
         const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
         
@@ -1047,10 +929,13 @@
         });
 
         if (putRes.ok) {
-          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-          syncStatus.className = "sync-status status-admin";
+          syncStatus.textContent = "Stato: Sincronizzato con GitHub ✅";
+        } else {
+          syncStatus.textContent = "Stato: Errore durante il commit ❌";
         }
-      } catch (err) {}
+      } catch (err) {
+        syncStatus.textContent = "Stato: Errore di rete durante il salvataggio ❌";
+      }
       renderProjects();
     }
 
@@ -1079,14 +964,6 @@
     }
 
     function renderProjects() {
-      const isSynced = isGitHubConfigured();
-
-      if (isSynced) {
-        openModalBtn.style.display = 'inline-flex';
-      } else {
-        openModalBtn.style.display = 'none';
-      }
-
       updateFilterCounts();
       projectsGrid.innerHTML = '';
 
@@ -1123,7 +1000,7 @@
           <div class="empty-state">
             <i class="fa-solid fa-folder-open"></i>
             <h3>Nessun lavoro trovato</h3>
-            <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun lavoro disponibile al momento.'}</p>
+            <p>Aggiungi un nuovo lavoro cliccando sul pulsante in alto.</p>
           </div>
         `;
         return;
@@ -1131,27 +1008,20 @@
 
       filtered.forEach(project => {
         const card = document.createElement('div');
-        card.className = 'project-card' + (isSynced ? ' interactive' : '');
-        
-        if (isSynced) {
-          card.addEventListener('click', (e) => {
-            if (!e.target.closest('button') && !e.target.closest('a')) {
-              openEditModal(project.id);
-            }
-          });
-        }
-
-        const deleteBtnHtml = isSynced 
-          ? `<button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
-               <i class="fa-solid fa-trash-can"></i>
-             </button>` 
-          : '';
+        card.className = 'project-card';
+        card.addEventListener('click', (e) => {
+          if (!e.target.closest('button') && !e.target.closest('a')) {
+            openEditModal(project.id);
+          }
+        });
 
         card.innerHTML = `
           <div>
             <div class="card-top">
               <span class="category-badge">${escapeHtml(project.category)}</span>
-              ${deleteBtnHtml}
+              <button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
             <h3 class="project-title">${escapeHtml(project.title)}</h3>
             <p class="project-description">${escapeHtml(project.description)}</p>
@@ -1200,7 +1070,6 @@
     }
 
     function openCreateModal() {
-      if (!isGitHubConfigured()) return;
       addWorkForm.reset();
       editProjectId.value = '';
       modalTitleText.textContent = 'Aggiungi Nuovo Lavoro';
@@ -1209,7 +1078,6 @@
     }
 
     function openEditModal(id) {
-      if (!isGitHubConfigured()) return;
       const project = projects.find(p => p.id === id);
       if (!project) return;
 
@@ -1225,7 +1093,6 @@
     }
 
     window.promptDeleteProject = function(id, event) {
-      if (!isGitHubConfigured()) return;
       event.stopPropagation();
       projectToDeleteId = id;
       deleteModal.classList.add('active');
@@ -1270,11 +1137,11 @@
     function escapeHtml(str) {
       return str.replace(/[&<>"']/g, function(m) {
         return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
+          '&': '&',
+          '<': '<',
+          '>': '>',
+          '"': '"',
+          "'": '''
         }[m];
       });
     }
