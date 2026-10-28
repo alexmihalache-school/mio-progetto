@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portfolio</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+
   <style>
     * {
       margin: 0;
@@ -780,11 +780,7 @@
         </div>
       </div>
 
-      <div class="projects-grid" id="projectsGrid">
-        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
-        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
-        <div class="skeleton-card"><div class="skeleton-line badge"></div><div class="skeleton-line title"></div><div class="skeleton-line text"></div><div class="skeleton-line text"></div><div class="skeleton-line text short"></div></div>
-      </div>
+      <div class="projects-grid" id="projectsGrid"></div>
     </section>
   </main>
 
@@ -882,244 +878,351 @@
   </footer>
 
   <script>
-    const STORAGE_KEY_PROJECTS = 'alex_projects_v4';
-    const STORAGE_KEY_CONFIG = 'gh_sync_config';
-    const STORAGE_KEY_CACHE = 'gh_sync_cache';
-    const STORAGE_KEY_ADMIN = 'gh_sync_admin_flag';
-    const STORAGE_KEY_PUBLIC_CACHE = 'gh_public_cache';
+    (function() {
+      const STORAGE_KEY_PROJECTS = 'alex_projects_v4';
+      const STORAGE_KEY_CONFIG = 'gh_sync_config';
+      const STORAGE_KEY_CACHE = 'gh_sync_cache';
+      const STORAGE_KEY_ADMIN = 'gh_sync_admin_flag';
+      const STORAGE_KEY_PUBLIC_CACHE = 'gh_public_cache';
 
-    let ghConfig = { token: '', repo: '', path: 'projects.json' };
-    let projects = [];
-    let activeFilter = 'all';
-    let searchQuery = '';
-    let projectToDeleteId = null;
-    let pendingConfigValidation = null;
+      let ghConfig = { token: '', repo: '', path: 'projects.json' };
+      let projects = [];
+      let activeFilter = 'all';
+      let searchQuery = '';
+      let projectToDeleteId = null;
 
-    const projectsGrid = document.getElementById('projectsGrid');
-    const searchInput = document.getElementById('searchInput');
-    const filterContainer = document.getElementById('filterContainer');
-    const openModalBtn = document.getElementById('openModalBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const workModal = document.getElementById('workModal');
-    const addWorkForm = document.getElementById('addWorkForm');
-    const modalTitleText = document.getElementById('modalTitleText');
-    const saveBtnText = document.getElementById('saveBtnText');
-    const editProjectId = document.getElementById('editProjectId');
-    
-    const configBtn = document.getElementById('configBtn');
-    const configModal = document.getElementById('configModal');
-    const closeConfigModalBtn = document.getElementById('closeConfigModalBtn');
-    const cancelConfigBtn = document.getElementById('cancelConfigBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const configForm = document.getElementById('configForm');
-    const ghTokenInput = document.getElementById('ghToken');
-    const ghRepoInput = document.getElementById('ghRepo');
-    const configErrorMsg = document.getElementById('configErrorMsg');
-    const syncStatus = document.getElementById('syncStatus');
-
-    const deleteModal = document.getElementById('deleteModal');
-    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
-    function isGitHubConfigured() {
-      return Boolean(ghConfig.token && ghConfig.repo);
-    }
-
-    function setAdminStatus(admin) {
-      if (admin) {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
-        syncStatus.className = "sync-status status-admin";
-      } else {
-        syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
-        syncStatus.className = "sync-status";
+      function safeParse(json) {
+        try { return JSON.parse(json); } catch (e) { return null; }
       }
-      openModalBtn.style.display = admin ? 'inline-flex' : 'none';
-    }
 
-    function safeParse(json) {
-      try { return JSON.parse(json); } catch (e) { return null; }
-    }
-
-    function loadCachedProjects() {
-      const c1 = safeParse(localStorage.getItem(STORAGE_KEY_CACHE));
-      if (Array.isArray(c1) && c1.length) return c1;
-      const c2 = safeParse(localStorage.getItem(STORAGE_KEY_PROJECTS));
-      if (Array.isArray(c2) && c2.length) return c2;
-      const c3 = safeParse(localStorage.getItem(STORAGE_KEY_PUBLIC_CACHE));
-      if (Array.isArray(c3) && c3.length) return c3;
-      return [];
-    }
-
-    function scheduleIdle(fn) {
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(fn, { timeout: 800 });
-      } else {
-        setTimeout(fn, 50);
+      function loadCachedProjects() {
+        const c1 = safeParse(localStorage.getItem(STORAGE_KEY_CACHE));
+        if (Array.isArray(c1) && c1.length) return c1;
+        const c2 = safeParse(localStorage.getItem(STORAGE_KEY_PROJECTS));
+        if (Array.isArray(c2) && c2.length) return c2;
+        const c3 = safeParse(localStorage.getItem(STORAGE_KEY_PUBLIC_CACHE));
+        if (Array.isArray(c3) && c3.length) return c3;
+        return [];
       }
-    }
 
-    function bootstrapSync() {
       const cfg = safeParse(localStorage.getItem(STORAGE_KEY_CONFIG));
-      if (cfg && cfg.token && cfg.repo) {
-        ghConfig = cfg;
-      }
-
+      if (cfg && cfg.token && cfg.repo) ghConfig = cfg;
       projects = loadCachedProjects();
 
-      const configured = isGitHubConfigured();
-      setAdminStatus(configured);
+      const projectsGrid = document.getElementById('projectsGrid');
+      const searchInput = document.getElementById('searchInput');
+      const filterContainer = document.getElementById('filterContainer');
+      const openModalBtn = document.getElementById('openModalBtn');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const workModal = document.getElementById('workModal');
+      const addWorkForm = document.getElementById('addWorkForm');
+      const modalTitleText = document.getElementById('modalTitleText');
+      const saveBtnText = document.getElementById('saveBtnText');
+      const editProjectId = document.getElementById('editProjectId');
 
-      renderProjects();
+      const configBtn = document.getElementById('configBtn');
+      const configModal = document.getElementById('configModal');
+      const closeConfigModalBtn = document.getElementById('closeConfigModalBtn');
+      const cancelConfigBtn = document.getElementById('cancelConfigBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const configForm = document.getElementById('configForm');
+      const ghTokenInput = document.getElementById('ghToken');
+      const ghRepoInput = document.getElementById('ghRepo');
+      const configErrorMsg = document.getElementById('configErrorMsg');
+      const syncStatus = document.getElementById('syncStatus');
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          scheduleIdle(() => {
-            if (isGitHubConfigured()) {
-              syncInBackground();
-            } else {
-              fetchPublicDataInBackground();
-            }
-          });
+      const deleteModal = document.getElementById('deleteModal');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+      function isGitHubConfigured() {
+        return Boolean(ghConfig.token && ghConfig.repo);
+      }
+
+      function setAdminStatus(admin) {
+        if (admin) {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Admin</span>';
+          syncStatus.className = "sync-status status-admin";
+        } else {
+          syncStatus.innerHTML = 'Stato: <span class="status-role">Utente</span>';
+          syncStatus.className = "sync-status";
+        }
+        openModalBtn.style.display = admin ? 'inline-flex' : 'none';
+      }
+
+      function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
         });
-      });
-    }
+      }
 
-    async function fetchPublicDataInBackground() {
-      try {
-        const rawRepo = promptRepoFallback();
-        if (!rawRepo) return;
-        const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${Date.now()}`;
-        const res = await fetch(publicUrl, { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            projects = data;
+      function renderProjects() {
+        const isSynced = isGitHubConfigured();
+        openModalBtn.style.display = isSynced ? 'inline-flex' : 'none';
+
+        const total = projects.length;
+        const countDefault = projects.filter(p => p.category === 'Default').length;
+        const countIncompleto = projects.filter(p => p.category === 'Incompleto').length;
+        const countCompleto = projects.filter(p => p.category === 'Completo').length;
+        const countAttesa = projects.filter(p => p.category === 'Attesa valutazione').length;
+
+        filterContainer.querySelectorAll('.filter-btn').forEach(btn => {
+          const t = btn.getAttribute('data-filter');
+          if (t === 'all') btn.textContent = `Tutti (${total})`;
+          else if (t === 'Default') btn.textContent = `Default (${countDefault})`;
+          else if (t === 'Incompleto') btn.textContent = `Incompleto (${countIncompleto})`;
+          else if (t === 'Completo') btn.textContent = `Completo (${countCompleto})`;
+          else if (t === 'Attesa valutazione') btn.textContent = `Attesa valutazione (${countAttesa})`;
+        });
+
+        const q = searchQuery.toLowerCase();
+        const filtered = projects.filter(project => {
+          const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
+          const matchesSearch = (project.title || '').toLowerCase().includes(q) ||
+                              (project.description || '').toLowerCase().includes(q) ||
+                              (project.category || '').toLowerCase().includes(q);
+          return matchesCategory && matchesSearch;
+        });
+
+        const categoryOrder = { 'Attesa valutazione': 1, 'Incompleto': 2, 'Default': 3, 'Completo': 4 };
+        filtered.sort((a, b) => {
+          if (activeFilter === 'all') {
+            const oa = categoryOrder[a.category] || 99;
+            const ob = categoryOrder[b.category] || 99;
+            if (oa !== ob) return oa - ob;
+          }
+          return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
+        });
+
+        if (filtered.length === 0) {
+          projectsGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fa-solid fa-folder-open"></i>
+              <h3>Nessun lavoro trovato</h3>
+              <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun lavoro disponibile al momento.'}</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        for (let i = 0; i < filtered.length; i++) {
+          const project = filtered[i];
+          const deleteBtnHtml = isSynced
+            ? `<button class="btn-delete" data-id="${escapeHtml(project.id)}" title="Elimina Lavoro"><i class="fa-solid fa-trash-can"></i></button>`
+            : '';
+          html += `
+            <div class="project-card${isSynced ? ' interactive' : ''}" data-id="${escapeHtml(project.id)}">
+              <div>
+                <div class="card-top">
+                  <span class="category-badge">${escapeHtml(project.category)}</span>
+                  ${deleteBtnHtml}
+                </div>
+                <h3 class="project-title">${escapeHtml(project.title)}</h3>
+                <p class="project-description">${escapeHtml(project.description)}</p>
+              </div>
+              <div class="card-footer">
+                <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" class="project-link">
+                  Visita Progetto <i class="fa-solid fa-arrow-right-long"></i>
+                </a>
+              </div>
+            </div>
+          `;
+        }
+        projectsGrid.innerHTML = html;
+
+        if (isSynced) {
+          projectsGrid.querySelectorAll('.project-card.interactive').forEach(card => {
+            card.addEventListener('click', (e) => {
+              if (!e.target.closest('button') && !e.target.closest('a')) {
+                openEditModal(card.getAttribute('data-id'));
+              }
+            });
+          });
+          projectsGrid.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              promptDeleteProject(btn.getAttribute('data-id'));
+            });
+          });
+        }
+      }
+
+      function setAdminStatusAndRender() {
+        setAdminStatus(isGitHubConfigured());
+        renderProjects();
+      }
+
+      setAdminStatusAndRender();
+
+      function scheduleAfterPaint(fn) {
+        if (window.requestAnimationFrame) {
+          requestAnimationFrame(() => requestAnimationFrame(fn));
+        } else {
+          setTimeout(fn, 16);
+        }
+      }
+
+      scheduleAfterPaint(() => {
+        if (isGitHubConfigured()) {
+          syncInBackground();
+        } else {
+          fetchPublicDataInBackground();
+        }
+      });
+
+      async function fetchPublicDataInBackground() {
+        try {
+          const rawRepo = promptRepoFallback();
+          if (!rawRepo) return;
+          const publicUrl = `https://raw.githubusercontent.com/${rawRepo}/main/${ghConfig.path}?t=${Date.now()}`;
+          const res = await fetch(publicUrl, { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              projects = data;
+              try {
+                localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+                localStorage.setItem(STORAGE_KEY_PUBLIC_CACHE, JSON.stringify(projects));
+              } catch (e) {}
+              setAdminStatus(false);
+              renderProjects();
+            }
+          }
+        } catch (e) {}
+      }
+
+      async function syncInBackground() {
+        try {
+          const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}?t=${Date.now()}`;
+          const res = await fetch(url, {
+            headers: { 'Authorization': `token ${ghConfig.token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            let decoded;
+            try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
+            if (Array.isArray(decoded)) {
+              projects = decoded;
+              try {
+                localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+                localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+              } catch (e) {}
+              setAdminStatus(true);
+              renderProjects();
+            }
+          } else if (res.status === 404) {
+            setAdminStatus(true);
+          } else if (res.status === 401 || res.status === 403) {
+            ghConfig = { token: '', repo: '', path: 'projects.json' };
             try {
-              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-              localStorage.setItem(STORAGE_KEY_PUBLIC_CACHE, JSON.stringify(projects));
+              localStorage.removeItem(STORAGE_KEY_CONFIG);
+              localStorage.removeItem(STORAGE_KEY_ADMIN);
             } catch (e) {}
             setAdminStatus(false);
             renderProjects();
           }
-        }
-      } catch (e) {}
-    }
-
-    async function syncInBackground() {
-      try {
-        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}?t=${Date.now()}`;
-        const res = await fetch(url, {
-          headers: { 'Authorization': `token ${ghConfig.token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          let decoded;
-          try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
-          if (Array.isArray(decoded)) {
-            projects = decoded;
-            try {
-              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-              localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
-            } catch (e) {}
-            setAdminStatus(true);
-            renderProjects();
-          }
-        } else if (res.status === 404) {
-          setAdminStatus(true);
-        } else if (res.status === 401 || res.status === 403) {
-          setAdminStatus(false);
-          renderProjects();
-        }
-      } catch (err) {}
-    }
-
-    configBtn.addEventListener('click', () => {
-      ghTokenInput.value = ghConfig.token || '';
-      ghRepoInput.value = ghConfig.repo || '';
-      configErrorMsg.style.display = 'none';
-      logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
-      configModal.classList.add('active');
-    });
-
-    function closeConfigModal() {
-      configModal.classList.remove('active');
-      configErrorMsg.style.display = 'none';
-    }
-
-    closeConfigModalBtn.addEventListener('click', closeConfigModal);
-    cancelConfigBtn.addEventListener('click', closeConfigModal);
-    configModal.addEventListener('click', (e) => {
-      if (e.target === configModal) closeConfigModal();
-    });
-
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem(STORAGE_KEY_CONFIG);
-      localStorage.removeItem(STORAGE_KEY_CACHE);
-      localStorage.removeItem(STORAGE_KEY_ADMIN);
-      ghConfig = { token: '', repo: '', path: 'projects.json' };
-      ghTokenInput.value = '';
-      ghRepoInput.value = '';
-      configErrorMsg.style.display = 'none';
-      closeConfigModal();
-      setAdminStatus(false);
-      renderProjects();
-      scheduleIdle(fetchPublicDataInBackground);
-    });
-
-    configForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      configErrorMsg.style.display = 'none';
-      const token = ghTokenInput.value.trim();
-      const repo = ghRepoInput.value.trim();
-
-      if (!token || !repo) {
-        configErrorMsg.style.display = 'block';
-        return;
+        } catch (err) {}
       }
 
-      const newConfig = { token, repo, path: 'projects.json' };
-      ghConfig = newConfig;
+      configBtn.addEventListener('click', () => {
+        ghTokenInput.value = ghConfig.token || '';
+        ghRepoInput.value = ghConfig.repo || '';
+        configErrorMsg.style.display = 'none';
+        logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
+        configModal.classList.add('active');
+      });
 
-      try {
-        localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
-        localStorage.setItem(STORAGE_KEY_ADMIN, '1');
-      } catch (err) {}
-
-      closeConfigModal();
-      setAdminStatus(true);
-      renderProjects();
-
-      if (pendingConfigValidation) {
-        clearTimeout(pendingConfigValidation);
+      function closeConfigModal() {
+        configModal.classList.remove('active');
+        configErrorMsg.style.display = 'none';
       }
-      pendingConfigValidation = setTimeout(() => {
+
+      closeConfigModalBtn.addEventListener('click', closeConfigModal);
+      cancelConfigBtn.addEventListener('click', closeConfigModal);
+      configModal.addEventListener('click', (e) => {
+        if (e.target === configModal) closeConfigModal();
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        try {
+          localStorage.removeItem(STORAGE_KEY_CONFIG);
+          localStorage.removeItem(STORAGE_KEY_CACHE);
+          localStorage.removeItem(STORAGE_KEY_ADMIN);
+        } catch (e) {}
+        ghConfig = { token: '', repo: '', path: 'projects.json' };
+        ghTokenInput.value = '';
+        ghRepoInput.value = '';
+        configErrorMsg.style.display = 'none';
+        closeConfigModal();
+        setAdminStatus(false);
+        renderProjects();
+        scheduleAfterPaint(fetchPublicDataInBackground);
+      });
+
+      configForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        configErrorMsg.style.display = 'none';
+        const token = ghTokenInput.value.trim();
+        const repo = ghRepoInput.value.trim();
+
+        if (!token || !repo) {
+          configErrorMsg.style.display = 'block';
+          return;
+        }
+
+        const newConfig = { token, repo, path: 'projects.json' };
+        ghConfig = newConfig;
+
+        try {
+          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
+          localStorage.setItem(STORAGE_KEY_ADMIN, '1');
+        } catch (err) {}
+
+        closeConfigModal();
+        setAdminStatus(true);
+        renderProjects();
+
         validateConfigInBackground(newConfig);
-      }, 0);
-    });
+      });
 
-    async function validateConfigInBackground(config) {
-      try {
-        const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
-        const res = await fetch(url, {
-          headers: { 'Authorization': `token ${config.token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          let decoded;
-          try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
-          if (Array.isArray(decoded)) {
-            projects = decoded;
-            try {
-              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-              localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
-            } catch (e) {}
+      async function validateConfigInBackground(config) {
+        try {
+          const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
+          const res = await fetch(url, {
+            headers: { 'Authorization': `token ${config.token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            let decoded;
+            try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
+            if (Array.isArray(decoded)) {
+              projects = decoded;
+              try {
+                localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+                localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+              } catch (e) {}
+              setAdminStatus(true);
+              renderProjects();
+            }
+          } else if (res.status === 404) {
             setAdminStatus(true);
+          } else {
+            ghConfig = { token: '', repo: '', path: 'projects.json' };
+            try {
+              localStorage.removeItem(STORAGE_KEY_CONFIG);
+              localStorage.removeItem(STORAGE_KEY_ADMIN);
+            } catch (e) {}
+            setAdminStatus(false);
             renderProjects();
+            ghTokenInput.value = config.token;
+            ghRepoInput.value = config.repo;
+            configErrorMsg.style.display = 'block';
+            configModal.classList.add('active');
           }
-        } else if (res.status === 404) {
-          setAdminStatus(true);
-        } else {
+        } catch (err) {
           ghConfig = { token: '', repo: '', path: 'projects.json' };
           try {
             localStorage.removeItem(STORAGE_KEY_CONFIG);
@@ -1132,329 +1235,170 @@
           configErrorMsg.style.display = 'block';
           configModal.classList.add('active');
         }
-      } catch (err) {
-        ghConfig = { token: '', repo: '', path: 'projects.json' };
+      }
+
+      function promptRepoFallback() {
         try {
-          localStorage.removeItem(STORAGE_KEY_CONFIG);
-          localStorage.removeItem(STORAGE_KEY_ADMIN);
-        } catch (e) {}
-        setAdminStatus(false);
-        renderProjects();
-        ghTokenInput.value = config.token;
-        ghRepoInput.value = config.repo;
-        configErrorMsg.style.display = 'block';
-        configModal.classList.add('active');
-      }
-    }
-
-    function promptRepoFallback() {
-      try {
-        const hostnameParts = window.location.hostname.split('.');
-        if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
-          const username = hostnameParts[0];
-          const pathSegments = window.location.pathname.split('/').filter(Boolean);
-          const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
-          return `${username}/${repoName}`;
-        }
-      } catch (err) {}
-      return '';
-    }
-
-    async function saveToGitHub() {
-      try {
-        localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-        localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
-      } catch (e) {}
-      
-      if (!isGitHubConfigured()) {
-        renderProjects();
-        return;
-      }
-
-      try {
-        const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
-        
-        let sha = '';
-        const getRes = await fetch(url, {
-          headers: { 'Authorization': `token ${ghConfig.token}` }
-        });
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-        }
-
-        const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
-        const bodyData = {
-          message: "Aggiornamento portfolio via interfaccia web",
-          content: contentEncoded,
-          sha: sha || undefined
-        };
-
-        const putRes = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${ghConfig.token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bodyData)
-        });
-
-        if (putRes.ok) {
-          setAdminStatus(true);
-        }
-      } catch (err) {}
-      renderProjects();
-    }
-
-    function updateFilterCounts() {
-      const total = projects.length;
-      const countDefault = projects.filter(p => p.category === 'Default').length;
-      const countIncompleto = projects.filter(p => p.category === 'Incompleto').length;
-      const countCompleto = projects.filter(p => p.category === 'Completo').length;
-      const countAttesaValutazione = projects.filter(p => p.category === 'Attesa valutazione').length;
-
-      const buttons = filterContainer.querySelectorAll('.filter-btn');
-      buttons.forEach(btn => {
-        const filterType = btn.getAttribute('data-filter');
-        if (filterType === 'all') {
-          btn.textContent = `Tutti (${total})`;
-        } else if (filterType === 'Default') {
-          btn.textContent = `Default (${countDefault})`;
-        } else if (filterType === 'Incompleto') {
-          btn.textContent = `Incompleto (${countIncompleto})`;
-        } else if (filterType === 'Completo') {
-          btn.textContent = `Completo (${countCompleto})`;
-        } else if (filterType === 'Attesa valutazione') {
-          btn.textContent = `Attesa valutazione (${countAttesaValutazione})`;
-        }
-      });
-    }
-
-    function renderProjects() {
-      const isSynced = isGitHubConfigured();
-
-      openModalBtn.style.display = isSynced ? 'inline-flex' : 'none';
-
-      updateFilterCounts();
-      projectsGrid.innerHTML = '';
-
-      const filtered = projects.filter(project => {
-        const matchesCategory = activeFilter === 'all' || project.category === activeFilter;
-        const q = searchQuery.toLowerCase();
-        const matchesSearch = (project.title || '').toLowerCase().includes(q) || 
-                            (project.description || '').toLowerCase().includes(q) ||
-                            (project.category || '').toLowerCase().includes(q);
-        return matchesCategory && matchesSearch;
-      });
-
-      const categoryOrder = {
-        'Attesa valutazione': 1,
-        'Incompleto': 2,
-        'Default': 3,
-        'Completo': 4
-      };
-
-      filtered.sort((a, b) => {
-        if (activeFilter === 'all') {
-          const orderA = categoryOrder[a.category] || 99;
-          const orderB = categoryOrder[b.category] || 99;
-          if (orderA !== orderB) return orderA - orderB;
-          return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
-        } else {
-          return a.title.localeCompare(b.title, 'it', { sensitivity: 'base' });
-        }
-      });
-
-      if (filtered.length === 0) {
-        projectsGrid.innerHTML = `
-          <div class="empty-state">
-            <i class="fa-solid fa-folder-open"></i>
-            <h3>Nessun lavoro trovato</h3>
-            <p>${isSynced ? 'Aggiungi un nuovo lavoro cliccando sul pulsante in alto.' : 'Nessun lavoro disponibile al momento.'}</p>
-          </div>
-        `;
-        return;
-      }
-
-      const frag = document.createDocumentFragment();
-
-      filtered.forEach(project => {
-        const card = document.createElement('div');
-        card.className = 'project-card' + (isSynced ? ' interactive' : '');
-        
-        if (isSynced) {
-          card.addEventListener('click', (e) => {
-            if (!e.target.closest('button') && !e.target.closest('a')) {
-              openEditModal(project.id);
-            }
-          });
-        }
-
-        const deleteBtnHtml = isSynced 
-          ? `<button class="btn-delete" title="Elimina Lavoro" onclick="promptDeleteProject('${project.id}', event)">
-               <i class="fa-solid fa-trash-can"></i>
-             </button>` 
-          : '';
-
-        card.innerHTML = `
-          <div>
-            <div class="card-top">
-              <span class="category-badge">${escapeHtml(project.category)}</span>
-              ${deleteBtnHtml}
-            </div>
-            <h3 class="project-title">${escapeHtml(project.title)}</h3>
-            <p class="project-description">${escapeHtml(project.description)}</p>
-          </div>
-          <div class="card-footer">
-            <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" class="project-link">
-              Visita Progetto <i class="fa-solid fa-arrow-right-long"></i>
-            </a>
-          </div>
-        `;
-        frag.appendChild(card);
-      });
-      projectsGrid.appendChild(frag);
-    }
-
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      
-      const id = editProjectId.value;
-      const title = document.getElementById('workTitle').value.trim();
-      const category = document.getElementById('workCategory').value;
-      const url = document.getElementById('workUrl').value.trim();
-      const description = document.getElementById('workDesc').value.trim();
-
-      if (!title || !category || !url || !description) return;
-
-      if (id) {
-        projects = projects.map(p => {
-          if (p.id === id) {
-            return { ...p, title, category, url, description };
+          const hostnameParts = window.location.hostname.split('.');
+          if (hostnameParts.length >= 3 && hostnameParts[1] === 'github' && hostnameParts[2] === 'io') {
+            const username = hostnameParts[0];
+            const pathSegments = window.location.pathname.split('/').filter(Boolean);
+            const repoName = pathSegments.length > 0 ? pathSegments[0] : `${username}.github.io`;
+            return `${username}/${repoName}`;
           }
-          return p;
-        });
-      } else {
-        const newProject = {
-          id: Date.now().toString(),
-          title,
-          category,
-          url,
-          description
-        };
-        projects.unshift(newProject);
+        } catch (err) {}
+        return '';
       }
 
-      saveToGitHub();
-      closeModal();
-    }
+      async function saveToGitHub() {
+        try {
+          localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+          localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+        } catch (e) {}
 
-    function openCreateModal() {
-      if (!isGitHubConfigured()) return;
-      addWorkForm.reset();
-      editProjectId.value = '';
-      modalTitleText.textContent = 'Aggiungi Nuovo Lavoro';
-      saveBtnText.textContent = 'Salva Lavoro';
-      toggleModal(true);
-    }
-
-    function openEditModal(id) {
-      if (!isGitHubConfigured()) return;
-      const project = projects.find(p => p.id === id);
-      if (!project) return;
-
-      editProjectId.value = project.id;
-      document.getElementById('workTitle').value = project.title;
-      document.getElementById('workCategory').value = project.category;
-      document.getElementById('workUrl').value = project.url;
-      document.getElementById('workDesc').value = project.description;
-
-      modalTitleText.textContent = 'Modifica Lavoro / Tag';
-      saveBtnText.textContent = 'Aggiorna Lavoro';
-      toggleModal(true);
-    }
-
-    window.promptDeleteProject = function(id, event) {
-      if (!isGitHubConfigured()) return;
-      event.stopPropagation();
-      projectToDeleteId = id;
-      deleteModal.classList.add('active');
-    };
-
-    function closeDeleteModal() {
-      projectToDeleteId = null;
-      deleteModal.classList.remove('active');
-    }
-
-    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-    deleteModal.addEventListener('click', (e) => {
-      if (e.target === deleteModal) closeDeleteModal();
-    });
-
-    confirmDeleteBtn.addEventListener('click', () => {
-      if (projectToDeleteId) {
-        projects = projects.filter(p => p.id !== projectToDeleteId);
-        closeDeleteModal();
-        saveToGitHub();
-      }
-    });
-
-    function toggleModal(show) {
-      if (show) {
-        workModal.classList.add('active');
-      } else {
-        workModal.classList.remove('active');
-      }
-    }
-
-    function closeModal() {
-      toggleModal(false);
-      setTimeout(() => {
-        if (!workModal.classList.contains('active')) {
-          addWorkForm.reset();
-          editProjectId.value = '';
+        if (!isGitHubConfigured()) {
+          renderProjects();
+          return;
         }
-      }, 300);
-    }
 
-    function escapeHtml(str) {
-      if (str == null) return '';
-      return String(str).replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
-        }[m];
-      });
-    }
+        try {
+          const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
+          let sha = '';
+          const getRes = await fetch(url, {
+            headers: { 'Authorization': `token ${ghConfig.token}` }
+          });
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            sha = fileData.sha;
+          }
 
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value;
-      renderProjects();
-    });
+          const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
+          const bodyData = {
+            message: "Aggiornamento portfolio via interfaccia web",
+            content: contentEncoded,
+            sha: sha || undefined
+          };
 
-    filterContainer.addEventListener('click', (e) => {
-      if (e.target.classList.contains('filter-btn')) {
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-        activeFilter = e.target.getAttribute('data-filter');
+          const putRes = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${ghConfig.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+          });
+
+          if (putRes.ok) setAdminStatus(true);
+        } catch (err) {}
         renderProjects();
       }
-    });
 
-    openModalBtn.addEventListener('click', openCreateModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-    
-    workModal.addEventListener('click', (e) => {
-      if (e.target === workModal) closeModal();
-    });
+      function handleFormSubmit(e) {
+        e.preventDefault();
+        const id = editProjectId.value;
+        const title = document.getElementById('workTitle').value.trim();
+        const category = document.getElementById('workCategory').value;
+        const url = document.getElementById('workUrl').value.trim();
+        const description = document.getElementById('workDesc').value.trim();
 
-    addWorkForm.addEventListener('submit', handleFormSubmit);
+        if (!title || !category || !url || !description) return;
 
-    bootstrapSync();
+        if (id) {
+          projects = projects.map(p => p.id === id ? { ...p, title, category, url, description } : p);
+        } else {
+          projects.unshift({ id: Date.now().toString(), title, category, url, description });
+        }
+
+        saveToGitHub();
+        closeModal();
+      }
+
+      function openCreateModal() {
+        if (!isGitHubConfigured()) return;
+        addWorkForm.reset();
+        editProjectId.value = '';
+        modalTitleText.textContent = 'Aggiungi Nuovo Lavoro';
+        saveBtnText.textContent = 'Salva Lavoro';
+        toggleModal(true);
+      }
+
+      function openEditModal(id) {
+        if (!isGitHubConfigured()) return;
+        const project = projects.find(p => p.id === id);
+        if (!project) return;
+        editProjectId.value = project.id;
+        document.getElementById('workTitle').value = project.title;
+        document.getElementById('workCategory').value = project.category;
+        document.getElementById('workUrl').value = project.url;
+        document.getElementById('workDesc').value = project.description;
+        modalTitleText.textContent = 'Modifica Lavoro / Tag';
+        saveBtnText.textContent = 'Aggiorna Lavoro';
+        toggleModal(true);
+      }
+
+      function promptDeleteProject(id) {
+        if (!isGitHubConfigured()) return;
+        projectToDeleteId = id;
+        deleteModal.classList.add('active');
+      }
+
+      function closeDeleteModal() {
+        projectToDeleteId = null;
+        deleteModal.classList.remove('active');
+      }
+
+      cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+      deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) closeDeleteModal();
+      });
+
+      confirmDeleteBtn.addEventListener('click', () => {
+        if (projectToDeleteId) {
+          projects = projects.filter(p => p.id !== projectToDeleteId);
+          closeDeleteModal();
+          saveToGitHub();
+        }
+      });
+
+      function toggleModal(show) {
+        if (show) workModal.classList.add('active');
+        else workModal.classList.remove('active');
+      }
+
+      function closeModal() {
+        toggleModal(false);
+        setTimeout(() => {
+          if (!workModal.classList.contains('active')) {
+            addWorkForm.reset();
+            editProjectId.value = '';
+          }
+        }, 300);
+      }
+
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderProjects();
+      });
+
+      filterContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-btn')) {
+          filterContainer.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          activeFilter = e.target.getAttribute('data-filter');
+          renderProjects();
+        }
+      });
+
+      openModalBtn.addEventListener('click', openCreateModal);
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelBtn.addEventListener('click', closeModal);
+
+      workModal.addEventListener('click', (e) => {
+        if (e.target === workModal) closeModal();
+      });
+
+      addWorkForm.addEventListener('submit', handleFormSubmit);
+    })();
   </script>
 </body>
 </html>
