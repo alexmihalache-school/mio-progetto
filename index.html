@@ -1263,48 +1263,33 @@
 
         try {
           const url = `https://api.github.com/repos/${ghConfig.repo}/contents/${ghConfig.path}`;
-          let sha = null;
+          let sha = '';
           const getRes = await fetch(url, {
-            headers: { 
-              'Authorization': `token ${ghConfig.token}`,
-              'Accept': 'application/vnd.github+json'
-            }
+            headers: { 'Authorization': `token ${ghConfig.token}` }
           });
-          
           if (getRes.ok) {
             const fileData = await getRes.json();
             sha = fileData.sha;
-          } else if (getRes.status !== 404) {
-             throw new Error(`Errore lettura GitHub: ${getRes.status}`);
           }
 
           const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(projects, null, 2))));
           const bodyData = {
             message: "Aggiornamento portfolio via interfaccia web",
             content: contentEncoded,
-            branch: "main"
+            sha: sha || undefined
           };
-          if (sha) bodyData.sha = sha;
 
           const putRes = await fetch(url, {
             method: 'PUT',
             headers: {
               'Authorization': `token ${ghConfig.token}`,
-              'Accept': 'application/vnd.github+json',
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(bodyData)
           });
 
-          if (!putRes.ok) {
-            const errData = await putRes.json();
-            alert("Errore salvataggio GitHub: " + (errData.message || putRes.status));
-          } else {
-             console.log("Commit creato con successo!");
-          }
-        } catch (err) {
-          alert("Errore di rete o di autorizzazione: " + err.message);
-        }
+          if (putRes.ok) setAdminStatus(true);
+        } catch (err) {}
         renderProjects();
       }
 
