@@ -315,6 +315,12 @@
       transform: translateY(-2px);
     }
 
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .filter-tags {
       display: flex;
       gap: 0.5rem;
@@ -1162,7 +1168,7 @@
         scheduleAfterPaint(fetchPublicDataInBackground);
       });
 
-      configForm.addEventListener('submit', (e) => {
+      configForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         configErrorMsg.style.display = 'none';
         const token = ghTokenInput.value.trim();
@@ -1174,66 +1180,56 @@
         }
 
         const newConfig = { token, repo, path: 'projects.json' };
-        ghConfig = newConfig;
 
-        try {
-          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
-          localStorage.setItem(STORAGE_KEY_ADMIN, '1');
-        } catch (err) {}
+        const submitBtn = configForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-        closeConfigModal();
-        setAdminStatus(true);
-        renderProjects();
+        const result = await validateConfig(newConfig);
 
-        validateConfigInBackground(newConfig);
+        if (submitBtn) submitBtn.disabled = false;
+
+        if (result.ok) {
+          ghConfig = newConfig;
+          try {
+            localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
+            localStorage.setItem(STORAGE_KEY_ADMIN, '1');
+          } catch (err) {}
+
+          if (result.projects) {
+            projects = result.projects;
+            try {
+              localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+              localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
+            } catch (e) {}
+          }
+
+          closeConfigModal();
+          setAdminStatus(true);
+          renderProjects();
+        } else {
+          configErrorMsg.style.display = 'block';
+        }
       });
 
-      async function validateConfigInBackground(config) {
+      async function validateConfig(config) {
         try {
           const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
           const res = await fetch(url, {
             headers: { 'Authorization': `token ${config.token}` }
           });
+
           if (res.ok) {
             const data = await res.json();
-            let decoded;
+            let decoded = null;
             try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
-            if (Array.isArray(decoded)) {
-              projects = decoded;
-              try {
-                localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-                localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
-              } catch (e) {}
-              setAdminStatus(true);
-              renderProjects();
-            }
+            return { ok: true, projects: Array.isArray(decoded) ? decoded : null };
           } else if (res.status === 404) {
-            setAdminStatus(true);
+            return { ok: true, projects: null };
           } else {
-            ghConfig = { token: '', repo: '', path: 'projects.json' };
-            try {
-              localStorage.removeItem(STORAGE_KEY_CONFIG);
-              localStorage.removeItem(STORAGE_KEY_ADMIN);
-            } catch (e) {}
-            setAdminStatus(false);
-            renderProjects();
-            ghTokenInput.value = config.token;
-            ghRepoInput.value = config.repo;
-            configErrorMsg.style.display = 'block';
-            configModal.classList.add('active');
+            return { ok: false };
           }
         } catch (err) {
-          ghConfig = { token: '', repo: '', path: 'projects.json' };
-          try {
-            localStorage.removeItem(STORAGE_KEY_CONFIG);
-            localStorage.removeItem(STORAGE_KEY_ADMIN);
-          } catch (e) {}
-          setAdminStatus(false);
-          renderProjects();
-          ghTokenInput.value = config.token;
-          ghRepoInput.value = config.repo;
-          configErrorMsg.style.display = 'block';
-          configModal.classList.add('active');
+          return { ok: false };
         }
       }
 
