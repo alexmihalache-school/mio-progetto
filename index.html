@@ -850,7 +850,7 @@
             <i class="fa-solid fa-right-from-bracket"></i> Esci
           </button>
           <button type="button" class="btn-secondary" id="cancelConfigBtn">Annulla</button>
-          <button type="submit" class="btn-primary" id="saveConfigBtn">Salva Configurazione</button>
+          <button type="submit" class="btn-primary">Salva Configurazione</button>
         </div>
       </form>
     </div>
@@ -931,7 +931,6 @@
       const ghRepoInput = document.getElementById('ghRepo');
       const configErrorMsg = document.getElementById('configErrorMsg');
       const syncStatus = document.getElementById('syncStatus');
-      const saveConfigBtn = document.getElementById('saveConfigBtn');
 
       const deleteModal = document.getElementById('deleteModal');
       const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -1132,8 +1131,6 @@
         ghTokenInput.value = ghConfig.token || '';
         ghRepoInput.value = ghConfig.repo || '';
         configErrorMsg.style.display = 'none';
-        saveConfigBtn.textContent = 'Salva Configurazione';
-        saveConfigBtn.disabled = false;
         logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
         configModal.classList.add('active');
       });
@@ -1165,7 +1162,7 @@
         scheduleAfterPaint(fetchPublicDataInBackground);
       });
 
-      configForm.addEventListener('submit', async (e) => {
+      configForm.addEventListener('submit', (e) => {
         e.preventDefault();
         configErrorMsg.style.display = 'none';
         const token = ghTokenInput.value.trim();
@@ -1176,54 +1173,69 @@
           return;
         }
 
-        saveConfigBtn.textContent = 'Verifica in corso...';
-        saveConfigBtn.disabled = true;
+        const newConfig = { token, repo, path: 'projects.json' };
+        ghConfig = newConfig;
 
         try {
-          const url = `https://api.github.com/repos/${repo}/contents/projects.json`;
-          const res = await fetch(url, {
-            headers: { 'Authorization': `token ${token}` }
-          });
+          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
+          localStorage.setItem(STORAGE_KEY_ADMIN, '1');
+        } catch (err) {}
 
+        closeConfigModal();
+        setAdminStatus(true);
+        renderProjects();
+
+        validateConfigInBackground(newConfig);
+      });
+
+      async function validateConfigInBackground(config) {
+        try {
+          const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
+          const res = await fetch(url, {
+            headers: { 'Authorization': `token ${config.token}` }
+          });
           if (res.ok) {
             const data = await res.json();
             let decoded;
-            try { decoded = JSON.parse(atob(data.content)); } catch (err) { decoded = null; }
+            try { decoded = JSON.parse(atob(data.content)); } catch (e) { decoded = null; }
             if (Array.isArray(decoded)) {
               projects = decoded;
               try {
                 localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
                 localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
-              } catch (err) {}
+              } catch (e) {}
+              setAdminStatus(true);
+              renderProjects();
             }
-            ghConfig = { token, repo, path: 'projects.json' };
-            try {
-              localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
-              localStorage.setItem(STORAGE_KEY_ADMIN, '1');
-            } catch (err) {}
-            closeConfigModal();
-            setAdminStatus(true);
-            renderProjects();
           } else if (res.status === 404) {
-            ghConfig = { token, repo, path: 'projects.json' };
-            try {
-              localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(ghConfig));
-              localStorage.setItem(STORAGE_KEY_ADMIN, '1');
-            } catch (err) {}
-            closeConfigModal();
             setAdminStatus(true);
-            renderProjects();
           } else {
+            ghConfig = { token: '', repo: '', path: 'projects.json' };
+            try {
+              localStorage.removeItem(STORAGE_KEY_CONFIG);
+              localStorage.removeItem(STORAGE_KEY_ADMIN);
+            } catch (e) {}
+            setAdminStatus(false);
+            renderProjects();
+            ghTokenInput.value = config.token;
+            ghRepoInput.value = config.repo;
             configErrorMsg.style.display = 'block';
-            saveConfigBtn.textContent = 'Salva Configurazione';
-            saveConfigBtn.disabled = false;
+            configModal.classList.add('active');
           }
         } catch (err) {
+          ghConfig = { token: '', repo: '', path: 'projects.json' };
+          try {
+            localStorage.removeItem(STORAGE_KEY_CONFIG);
+            localStorage.removeItem(STORAGE_KEY_ADMIN);
+          } catch (e) {}
+          setAdminStatus(false);
+          renderProjects();
+          ghTokenInput.value = config.token;
+          ghRepoInput.value = config.repo;
           configErrorMsg.style.display = 'block';
-          saveConfigBtn.textContent = 'Salva Configurazione';
-          saveConfigBtn.disabled = false;
+          configModal.classList.add('active');
         }
-      });
+      }
 
       function promptRepoFallback() {
         try {
