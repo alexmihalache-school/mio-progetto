@@ -890,6 +890,7 @@
       let activeFilter = 'all';
       let searchQuery = '';
       let projectToDeleteId = null;
+      let isEditingConfig = false;
 
       function safeParse(json) {
         try { return JSON.parse(json); } catch (e) { return null; }
@@ -1132,6 +1133,7 @@
         ghRepoInput.value = ghConfig.repo || '';
         configErrorMsg.style.display = 'none';
         logoutBtn.style.display = isGitHubConfigured() ? 'inline-flex' : 'none';
+        isEditingConfig = isGitHubConfigured(); 
         configModal.classList.add('active');
       });
 
@@ -1181,6 +1183,13 @@
           localStorage.setItem(STORAGE_KEY_ADMIN, '1');
         } catch (err) {}
 
+        if (!isEditingConfig) {
+          closeConfigModal();
+        }
+        
+        setAdminStatus(true);
+        renderProjects();
+
         validateConfigInBackground(newConfig);
       });
 
@@ -1191,7 +1200,7 @@
             headers: { 'Authorization': `token ${config.token}` }
           });
           if (res.ok) {
-            closeConfigModal();
+            if (isEditingConfig) closeConfigModal();
             setAdminStatus(true);
             renderProjects();
             const data = await res.json();
@@ -1206,7 +1215,7 @@
               renderProjects();
             }
           } else if (res.status === 404) {
-            closeConfigModal();
+            if (isEditingConfig) closeConfigModal();
             setAdminStatus(true);
             renderProjects();
           } else {
@@ -1217,9 +1226,11 @@
             } catch (e) {}
             setAdminStatus(false);
             renderProjects();
+            
             ghTokenInput.value = config.token;
             ghRepoInput.value = config.repo;
             configErrorMsg.style.display = 'block';
+            configModal.classList.add('active');
           }
         } catch (err) {
           ghConfig = { token: '', repo: '', path: 'projects.json' };
@@ -1229,9 +1240,11 @@
           } catch (e) {}
           setAdminStatus(false);
           renderProjects();
+          
           ghTokenInput.value = config.token;
           ghRepoInput.value = config.repo;
           configErrorMsg.style.display = 'block';
+          configModal.classList.add('active');
         }
       }
 
