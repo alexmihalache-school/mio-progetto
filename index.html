@@ -1181,16 +1181,19 @@
           localStorage.setItem(STORAGE_KEY_ADMIN, '1');
         } catch (err) {}
 
-        validateConfigAndClose(newConfig);
+        closeConfigModal();
+        setAdminStatus(true);
+        renderProjects();
+
+        validateConfigInBackground(newConfig);
       });
 
-      async function validateConfigAndClose(config) {
+      async function validateConfigInBackground(config) {
         try {
           const url = `https://api.github.com/repos/${config.repo}/contents/${config.path}`;
           const res = await fetch(url, {
             headers: { 'Authorization': `token ${config.token}` }
           });
-          
           if (res.ok) {
             const data = await res.json();
             let decoded;
@@ -1201,14 +1204,11 @@
                 localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
                 localStorage.setItem(STORAGE_KEY_CACHE, JSON.stringify(projects));
               } catch (e) {}
+              setAdminStatus(true);
+              renderProjects();
             }
-            closeConfigModal();
-            setAdminStatus(true);
-            renderProjects();
           } else if (res.status === 404) {
-            closeConfigModal();
             setAdminStatus(true);
-            renderProjects();
           } else {
             ghConfig = { token: '', repo: '', path: 'projects.json' };
             try {
@@ -1217,8 +1217,10 @@
             } catch (e) {}
             setAdminStatus(false);
             renderProjects();
-            
+            ghTokenInput.value = config.token;
+            ghRepoInput.value = config.repo;
             configErrorMsg.style.display = 'block';
+            configModal.classList.add('active');
           }
         } catch (err) {
           ghConfig = { token: '', repo: '', path: 'projects.json' };
@@ -1228,8 +1230,10 @@
           } catch (e) {}
           setAdminStatus(false);
           renderProjects();
-          
+          ghTokenInput.value = config.token;
+          ghRepoInput.value = config.repo;
           configErrorMsg.style.display = 'block';
+          configModal.classList.add('active');
         }
       }
 
