@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<head>
+  <title>Calcolatrice</title>
+</head>
+<body>
 
+  <div>
+    <input type="text" id="num1">
+  </div>
+
+  <div>
+    <input type="text" id="num2">
+  </div>
+
+  <div>
+    <button onclick="selezionaOperazione('+')">+</button>
+    <button onclick="selezionaOperazione('-')">-</button>
+    <button onclick="selezionaOperazione('*')">*</button>
+    <button onclick="selezionaOperazione('/')">/</button>
+    <button onclick="calcolaRisultato()">=</button>
+  </div>
+
+  <div>
+    <input type="text" id="result" readonly>
+  </div>
+
+  <script>
+    let operazioneSelezionata = null;
+
+    function selezionaOperazione(op) {
+      operazioneSelezionata = op;
+    }
+
+    function calcolaRisultato() {
+      const num1 = parseFloat(document.getElementById('num1').value);
+      const num2 = parseFloat(document.getElementById('num2').value);
+      const campoRisultato = document.getElementById('result');
+
+      if (!operazioneSelezionata) {
+        campoRisultato.value = "Seleziona operazione";
+        return;
+      }
+
+      let calcolo = 0;
+
+      if (operazioneSelezionata == '+') {
+        calcolo = num1 + num2;
+      } else if (operazioneSelezionata == '-') {
+        calcolo = num1 - num2;
+      } else if (operazioneSelezionata == '*') {
+        calcolo = num1 * num2;
+      } else if (operazioneSelezionata == '/') {
+        if (num2 == 0) return campoRisultato.value = "Errore";
+        calcolo = num1 / num2;
+      }
+      campoRisultato.value = String(Number(calcolo.toFixed(3)));
+    }
+  </script>
+
+</body>
+</html>
