@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anagrafica 1.0</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0d0d0d;
+      color: #e6e6e6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    p.subtitle {
+      color: #888888;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #aaaaaa;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input {
+      background: #1e1e1e;
+      border: 1px solid #333333;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input::placeholder {
+      color: #555555;
+    }
+
+    input:focus {
+      border-color: #ffffff;
+      background: #252525;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    }
+
+    button {
+      width: 100%;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 8px;
+      padding: 0.9rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 2.5rem;
+    }
+
+    button:hover {
+      background: #cccccc;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .table-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #ffffff;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 0.5rem;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      background: #1a1a1a;
+      color: #888888;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #222222;
+      font-size: 0.95rem;
+      color: #dddddd;
+    }
+
+    tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background: #1c1c1c;
+    }
+
+    tbody:empty::after {
+      content: "Nessun dato inserito nella tabella";
+      display: block;
+      padding: 1.5rem;
+      color: #444444;
+      font-style: italic;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Anagrafica 1.0</h2>
+
+    <div class="form-grid">
+      <div class="input-group">
+        <label for="nomino">Nome</label>
+        <input type="text" id="nomino" placeholder="Alexandru">
+      </div>
+      <div class="input-group">
+        <label for="cognomimo">Cognome</label>
+        <input type="text" id="cognomimo" placeholder="Mihalache">
+      </div>
+      <div class="input-group">
+        <label for="indirizzino">Indirizzo</label>
+        <input type="text" id="indirizzino" placeholder="Massacciuccioli 48/50">
+      </div>
+      <div class="input-group">
+        <label for="cittino">Città</label>
+        <input type="text" id="cittino" placeholder="Roma">
+      </div>
+      <div class="input-group">
+        <label for="etino">Età</label>
+        <input type="number" id="etino" placeholder="18">
+      </div>
+    </div>
+
+    <button type="button" onclick="aggiungiRiga()">Aggiungi alla Tabella</button>
+
+    <div class="table-container">
+      <table id="tabellaAnagrafica">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Indirizzo</th>
+            <th>Città</th>
+            <th>Età</th>
+          </tr>
+        </thead>
+        <tbody id="dati">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function aggiungiRiga() {
+      const nome = document.getElementById('nomino').value;
+      const cognome = document.getElementById('cognomimo').value;
+      const indirizzo = document.getElementById('indirizzino').value;
+      const citta = document.getElementById('cittino').value;
+      const eta = document.getElementById('etino').value;
+
+      if (!nome || !cognome || !indirizzo || !citta || !eta) {
+        alert("Compila tutti i campi prima di aggiungere la riga.");
+        return;
+      }
+
+      document.getElementById('dati').innerHTML +=
+        '<tr>' +
+          '<td>' + nome + '</td>' +
+          '<td>' + cognome + '</td>' +
+          '<td>' + indirizzo + '</td>' +
+          '<td>' + citta + '</td>' +
+          '<td>' + eta + '</td>' +
+        '</tr>';
+    }
+  </script>
+
+</body>
+</html>
