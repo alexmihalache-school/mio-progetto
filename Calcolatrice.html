@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="it">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calcolatrice</title>
   <style>
@@ -73,10 +73,6 @@
       border-color: #666666;
     }
 
-    .input-group input::placeholder {
-      color: #666666;
-    }
-
     .buttons-row {
       display: flex;
       gap: 15px;
@@ -128,10 +124,6 @@
       outline: none;
       width: 100%;
     }
-
-    .result-group input::placeholder {
-      color: #666666;
-    }
   </style>
 </head>
 <body>
@@ -142,11 +134,11 @@
     <div class="grid">
       <div class="input-group">
         <label for="num1">Primo numero</label>
-        <input type="text" id="num1">
+        <input type="number" id="num1">
       </div>
       <div class="input-group">
         <label for="num2">Secondo numero</label>
-        <input type="text" id="num2">
+        <input type="number" id="num2">
       </div>
     </div>
 
@@ -159,7 +151,7 @@
 
     <div class="result-group">
       <label for="result">Risultato</label>
-      <input type="text" id="result">
+      <input type="text" id="result" readonly>
     </div>
   </div>
 
