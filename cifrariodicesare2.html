@@ -1,1 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decripta Frase</title>
+</head>
+<body>
 
+    <h2>Decripta la frase</h2>
+
+    <p>Frase criptata: <b id="testoRicevuto"></b></p>
+
+    <p>Numero di scostamento:</p>
+    <input type="number" id="numero" value="3">
+
+    <br><br>
+    <button onclick="decripta()">Decripta</button>
+
+    <p>Frase corretta: <b id="risultato"></b></p>
+
+    <a href="index.html">Torna indietro</a>
+
+    <script>
+        let fraseCriptata = localStorage.getItem("messaggio");
+        document.getElementById("testoRicevuto").innerHTML = fraseCriptata;
+
+        function decripta() {
+            let alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            let spostamento = parseInt(document.getElementById("numero").value);
+            let fraseOriginale = "";
+
+            for (let i = 0; i < fraseCriptata.length; i++) {
+                let lettera = fraseCriptata[i];
+                let posizione = alfabeto.indexOf(lettera);
+
+                if (posizione == -1) {
+                    fraseOriginale += lettera;
+                } else {
+                    let nuovaPosizione = (posizione - spostamento) % 26;
+                    
+                    if (nuovaPosizione < 0) {
+                        nuovaPosizione += 26;
+                    }
+                    
+                    fraseOriginale += alfabeto[nuovaPosizione];
+                }
+            }
+
+            document.getElementById("risultato").innerHTML = fraseOriginale;
+        }
+    </script>
+
+</body>
+</html>
