@@ -14,7 +14,8 @@
         }
 
         body {
-            background-color: #0a0a0a;
+            /* Sfondo con alone rosso scuro in alto, come nell'immagine */
+            background: radial-gradient(circle at 50% 0%, #2a0505 0%, #0a0a0a 60%);
             color: #e0e0e0;
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
@@ -27,8 +28,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 40px;
-            border-bottom: 1px solid #333;
-            background-color: #050505;
+            border-bottom: 1px solid #1a1a1a;
+            background-color: transparent;
         }
 
         .logo {
@@ -48,19 +49,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            justify-content: flex-start; /* Allinea in alto invece che al centro */
+            padding: 60px 20px 40px 20px;
+            width: 100%;
         }
 
-        /* NUOVO STILE PER LA SCRITTA SOPRA IL TITOLO */
         .top-label {
             font-family: 'Montserrat', sans-serif;
             color: #a00000;
             font-size: 0.8rem;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             text-transform: uppercase;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 400;
+            text-align: center;
         }
 
         h1 {
@@ -71,38 +73,37 @@
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            background: linear-gradient(to bottom, #ffffff 0%, #aaaaaa 100%);
+            background: linear-gradient(to bottom, #ffffff 0%, #777777 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.8);
+            line-height: 1.2;
         }
 
         .subtitle {
             text-align: center;
             color: #888;
             max-width: 600px;
-            margin-bottom: 60px; /* Aumentato per fare spazio alla nuova scritta */
+            margin-bottom: 70px;
             line-height: 1.6;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
-        /* NUOVO STILE PER "I MIEI LAVORI" */
         .section-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: #fff;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             text-align: center;
         }
 
-        /* LINEA ROSSA DECORATIVA */
         .section-divider {
-            width: 60px;
+            width: 50px;
             height: 2px;
             background-color: #a00000;
-            margin: 0 auto 50px auto; /* Centrata e con spazio sotto */
+            margin: 0 auto 40px auto;
         }
 
         .projects-container {
@@ -110,21 +111,21 @@
             flex-direction: column;
             gap: 20px;
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
         }
 
         .project-btn {
             display: block;
             width: 100%;
-            padding: 20px;
-            background-color: #111;
-            border: 1px solid #333;
+            padding: 25px 20px;
+            background-color: #0d0d0d; /* Sfondo scuro della card */
+            border: 1px solid #222;
             border-radius: 8px;
             color: #fff;
             text-decoration: none;
             font-family: 'Cinzel', serif;
             font-size: 1.2rem;
-            text-align: center;
+            text-align: left; /* Allineamento a sinistra come nelle card */
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -133,9 +134,9 @@
 
         .project-btn:hover {
             border-color: #a00000;
-            background-color: #1a1a1a;
+            background-color: #151515;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(160, 0, 0, 0.2);
+            box-shadow: 0 5px 20px rgba(160, 0, 0, 0.15);
         }
 
         .project-btn::after {
@@ -144,7 +145,7 @@
             bottom: 0;
             left: 0;
             width: 0;
-            height: 3px;
+            height: 2px;
             background-color: #a00000;
             transition: width 0.3s ease;
         }
@@ -167,7 +168,6 @@
     </header>
 
     <main>
-        <!-- SCRITTA AGGIUNTA SOPRA IL NOME -->
         <div class="top-label">Portfolio & Showcase Progetti</div>
 
         <h1>Alexandru Ricardo Mihalache</h1>
@@ -176,7 +176,6 @@
             Benvenuto nel luogo dove raccolgo e condivido il mio lavoro. Dai un'occhiata ai progetti per vedere cosa realizzo.
         </p>
 
-        <!-- SCRITTA AGGIUNTA SOPRA I PULSANTI -->
         <h2 class="section-title">I Miei Lavori</h2>
         <div class="section-divider"></div>
 
@@ -185,7 +184,6 @@
                 Anagrafica 1.0
             </button>
 
-            <!-- Corretta la chiusura del tag button che mancava nel file originale -->
             <button class="project-btn" onclick="apriProgetto('https://alexmihalache-school.github.io/mio-progetto/Calcolatrice.html')">
                 Calcolatrice 1.0
             </button>
