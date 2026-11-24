@@ -143,27 +143,18 @@
         </p>
 
         <div class="projects-container">
-            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto1')">
+            <button class="project-btn" onclick="apriProgetto('https://alexmihalache-school.github.io/mio-progetto/Anagrafica.html')">
                 Anagrafica 1.0
             </button>
 
-            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto2')">
+            <button class="project-btn" onclick="apriProgetto('https://alexmihalache-school.github.io/mio-progetto/Calcolatrice.html')">
                 Calcolatrice 1.0
-            </button>
-
-            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto3')">
-                Progetto 3
-            </button>
-
-            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto4')">
-                Progetto 4
-            </button>
         </div>
     </main>
 
     <script>
         function apriProgetto(linkGitHub) {
-            window.location.href = linkGitHub;
+            window.open(linkGitHub, '_blank');
         }
     </script>
 </body>
