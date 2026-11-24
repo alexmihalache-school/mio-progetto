@@ -14,8 +14,8 @@
         }
 
         body {
-            /* Sfondo con alone rosso scuro in alto */
-            background: radial-gradient(circle at 50% 0%, #2a0505 0%, #0a0a0a 60%);
+            /* Sfondo nero uniforme, senza alone rosso */
+            background-color: #0a0a0a;
             color: #e0e0e0;
             font-family: 'Montserrat', sans-serif;
             min-height: 100vh;
@@ -123,14 +123,13 @@
             text-decoration: none;
             font-family: 'Cinzel', serif;
             font-size: 1.2rem;
-            text-align: center; /* Testo centrato */
+            text-align: center;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             cursor: pointer;
         }
 
-        /* Effetto hover sul bordo e sullo sfondo */
         .project-btn:hover {
             border-color: #a00000;
             background-color: #1a1a1a;
@@ -138,20 +137,18 @@
             box-shadow: 0 5px 15px rgba(160, 0, 0, 0.2);
         }
 
-        /* EFFETTO LINEA ROSSA CHE PARTE DAL CENTRO */
         .project-btn::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%; /* Posizionata al centro */
-            transform: translateX(-50%); /* Centrata perfettamente */
-            width: 0; /* Inizialmente larga 0 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
             height: 3px;
             background-color: #a00000;
-            transition: width 0.4s ease; /* Transizione per l'animazione */
+            transition: width 0.4s ease;
         }
 
-        /* Al passaggio del mouse, la linea si espande dal centro verso i lati */
         .project-btn:hover::after {
             width: 100%;
         }
