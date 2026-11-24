@@ -43,29 +43,6 @@
             color: #a00000;
         }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 0.8rem;
-            color: #888;
-        }
-
-        .btn-dashboard {
-            background-color: #222;
-            color: #fff;
-            padding: 8px 15px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.8rem;
-            transition: background 0.3s;
-        }
-
-        .btn-dashboard:hover {
-            background-color: #333;
-        }
-
         main {
             flex: 1;
             display: flex;
@@ -149,7 +126,6 @@
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             header { padding: 15px 20px; }
-            .header-right { display: none; }
         }
     </style>
 </head>
@@ -157,10 +133,6 @@
 
     <header>
         <div class="logo">IL MIO SITO<span>.</span></div>
-        <div class="header-right">
-            <span>Stato Utente</span>
-            <a href="#" class="btn-dashboard">Dashboard</a>
-        </div>
     </header>
 
     <main>
@@ -171,11 +143,11 @@
         </p>
 
         <div class="projects-container">
-            <button class="project-btn" onclick="apriProgetto('https://alexmihalache-school.github.io/mio-progetto/Anagrafica.html')">
+            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto1')">
                 Progetto 1
             </button>
 
-            <button class="project-btn" onclick="apriProgetto('https://alexmihalache-school.github.io/mio-progetto/Calcolatrice.html')">
+            <button class="project-btn" onclick="apriProgetto('https://github.com/tuonome/progetto2')">
                 Progetto 2
             </button>
 
