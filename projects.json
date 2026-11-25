@@ -11,7 +11,7 @@
     "title": "Calcolatrice 1.0",
     "category": "Attesa valutazione",
     "url": "https://alexmihalache-school.github.io/mio-progetto/Calcolatrice.html",
-    "description": "Creazione di un'interfaccia per eseguire le quattro operazioni aritmetiche di base su due numeri inseriti dall'utente, gestendo il calcolo tramite una funzione JavaScript attivata dai pulsanti e mostrando l'esito in un campo di testo (con controllo della divisione per zero)."
+    "description": "Creazione di un'interfaccia per eseguire le quattro operazioni aritmetiche su due numeri inseriti dall'utente tramite pulsanti e JavaScript, mostrando il risultato in un campo di testo con controllo sulla divisione per zero."
   },
   {
     "id": "1792779880034",
