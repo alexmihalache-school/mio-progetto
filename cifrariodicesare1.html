@@ -77,6 +77,18 @@
             border-color: #888888;
         }
 
+        /* Rimuove le freccette su Chrome, Safari, Edge e Opera */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Rimuove le freccette su Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
         button {
             width: 100%;
             background-color: #ffffff;
