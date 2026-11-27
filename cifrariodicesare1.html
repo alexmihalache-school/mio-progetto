@@ -1,53 +1,28 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Il Cifrario di Cesare - Cripta</title>
-</head>
-<body>
-
-    <h1>Il Cifrario di Cesare</h1>
-    <h2>Cripta frase</h2>
-
-    <p>Frase originale:</p>
-    <input type="text" id="frase" value="">
-
-    <p>Scostamento:</p>
-    <input type="number" id="numero" value="">
-
-    <br><br>
-    <button onclick="cripta()">Cripta</button>
-
-    <p>Frase criptata: <b id="risultato"></b></p>
-
-    <a href="https://alexmihalache-school.github.io/mio-progetto/cifrariodicesare2.html">Vai a Decripta</a>
-
     <script>
         function cripta() {
-            var testo = document.getElementById("frase").value.toLowerCase();
-            var shift = parseInt(document.getElementById("numero").value);
-            var alfabeto = "abcdefghijklmnopqrstuvwxyz";
-            var finale = "";
-
-            for (var i = 0; i < testo.length; i++) {
-                var lettera = testo[i];
-                var pos = alfabeto.indexOf(lettera);
-
-                switch (pos) {
-                    case -1:
-                        finale = finale + lettera;
-                        break;
-                    default:
-                        var nuovaPos = (pos + shift) % 26;
-                        finale = finale + alfabeto[nuovaPos];
-                        break;
-                }
+            var parola = document.getElementById("testo1").value;
+            var spostamento = parseFloat(document.getElementById("numero").value);
+            var lunghezza = parola.length;
+            var criptata = "";
+            for (let i = 0; i < parola.length; i++) {
+                var lettera = String.fromCharCode(parola.charCodeAt(i) + spostamento);
+                criptata = criptata + lettera;
             }
-
-            document.getElementById("risultato").innerText = finale;
-            localStorage.setItem("fraseCriptata", finale);
+            document.getElementById("criptata").innerHTML = criptata;
         }
     </script>
-
+</head>
+<body>
+    <h1>Criptare la parola</h1>
+    <h4>Inserisci il testo e il numero con cui criptare la parola</h4>
+    <input type="text" id="testo1" placeholder="Testo da criptare...">
+    <input type="number" id="numero" placeholder="Valore di spostamento...">
+    <button onclick="cripta()">Cripta</button>
+    <p>messaggio criptato:</p>
+    <p id="criptata"></p>
+    <a href="https://samuriva09-commits.github.io/scuola/cifrario-di-cesare/decripta.html"> Decripta la parola</a>
 </body>
 </html>
