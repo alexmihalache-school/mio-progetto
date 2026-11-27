@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <title>Cripta Frase</title>
+    <meta charset="UTF-8">
+    <title>Il Cifrario di Cesare - Cripta</title>
 </head>
 <body>
 
-    <h2>Cripta la frase</h2>
+    <h1>Il Cifrario di Cesare</h1>
+    <h2>Cripta frase</h2>
 
-    <p>Frase da criptare:</p>
-    <input type="text" id="frase">
+    <p>Frase originale:</p>
+    <input type="text" id="frase" value="test">
 
-    <p>Numero di scostamento:</p>
+    <p>Scostamento:</p>
     <input type="number" id="numero" value="3">
 
     <br><br>
@@ -18,30 +20,32 @@
 
     <p>Frase criptata: <b id="risultato"></b></p>
 
-    <a href="https://alexmihalache-school.github.io/mio-progetto/cifrariodicesare2.html">Vai a decriptare</a>
+    <a href="https://alexmihalache-school.github.io/mio-progetto/cifrariodicesare2.html">Vai a Decripta</a>
 
     <script>
         function cripta() {
-            let alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            let testo = document.getElementById("frase").value.toUpperCase();
-            let spostamento = parseInt(document.getElementById("numero").value);
-            let fraseCriptata = "";
+            var testo = document.getElementById("frase").value.toLowerCase();
+            var shift = parseInt(document.getElementById("numero").value);
+            var alfabeto = "abcdefghijklmnopqrstuvwxyz";
+            var finale = "";
 
-            for (let i = 0; i < testo.length; i++) {
-                let lettera = testo[i];
-                let posizione = alfabeto.indexOf(lettera);
+            for (var i = 0; i < testo.length; i++) {
+                var lettera = testo[i];
+                var pos = alfabeto.indexOf(lettera);
 
-                if (posizione == -1) {
-                    fraseCriptata += lettera;
-                } else {
-                    let nuovaPosizione = (posizione + spostamento) % 26;
-                    fraseCriptata += alfabeto[nuovaPosizione];
+                switch (pos) {
+                    case -1:
+                        finale = finale + lettera;
+                        break;
+                    default:
+                        var nuovaPos = (pos + shift) % 26;
+                        finale = finale + alfabeto[nuovaPos];
+                        break;
                 }
             }
 
-            document.getElementById("risultato").innerHTML = fraseCriptata;
-            
-            localStorage.setItem("messaggio", fraseCriptata);
+            document.getElementById("risultato").innerText = finale;
+            localStorage.setItem("fraseCriptata", finale);
         }
     </script>
 
